@@ -1,0 +1,6 @@
+services:
+  quizreactapp:
+    image: quizreactapp
+    build:
+      context: .
+      dockerfile: ./Dockerfile
