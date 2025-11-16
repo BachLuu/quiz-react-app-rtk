@@ -83,12 +83,13 @@ export const useAuth = () => {
    * 3. RTK Query invalidates 'User' tag
    * 4. AuthProvider (subscribed to getCurrentUser) auto-refetches
    * 5. Navigate to dashboard
+   * TODO: Unlock comment in production
    */
   const login = useCallback(
     async (credentials: LoginRequest) => {
-      const response = await loginMutation(credentials).unwrap();
+      // const response = await loginMutation(credentials).unwrap();
       navigate("/dashboard");
-      return response;
+      // return response;
     },
     [loginMutation, navigate]
   );
