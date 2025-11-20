@@ -4,9 +4,13 @@
  */
 
 import { ProtectedRoute, PublicRoute } from "@/components/auth";
+import { MainLayout } from "@/components/layouts/MainLayout";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { DashboardPage, ForbiddenPage, NotFoundPage } from ".";
+import { ForbiddenPage, NotFoundPage } from ".";
 import App from "../App"; // Import App component
+import HomePage from "./protected/HomePage";
+import ManagementPage from "./protected/ManagementPage";
+import ProfilePage from "./protected/ProfilePage";
 import { LoginPage } from "./public/LoginPage";
 import { RegisterPage } from "./public/RegisterPage";
 
@@ -25,7 +29,7 @@ export const router = createBrowserRouter([
       // Root redirect
       {
         path: "/",
-        element: <Navigate to="/login" replace />,
+        element: <Navigate to="/home" replace />,
       },
 
       // Public routes
@@ -48,10 +52,22 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           {
-            path: "/dashboard",
-            element: <DashboardPage />,
+            element: <MainLayout />,
+            children: [
+              {
+                path: "/home",
+                element: <HomePage />,
+              },
+              {
+                path: "/management",
+                element: <ManagementPage />,
+              },
+              {
+                path: "/profile",
+                element: <ProfilePage />,
+              },
+            ],
           },
-          // Thêm các protected routes khác ở đây
         ],
       },
 

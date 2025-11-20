@@ -3,7 +3,7 @@
  * Best practice: Higher-Order Component để protect routes cần authentication
  */
 
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/auth";
 import { Box, CircularProgress } from "@mui/material";
 
@@ -53,6 +53,7 @@ export const ProtectedRoute = ({
   forbiddenFallback,
 }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading, hasAnyRole } = useAuth();
+  const location = useLocation();
 
   // Show loading state
   if (isLoading) {
@@ -73,19 +74,19 @@ export const ProtectedRoute = ({
   }
 
   // Check authentication
-  if (!isAuthenticated) {
-    // Redirect to login, save current location để redirect back sau khi login
-    return <Navigate to={redirectTo} state={{ from: location }} replace />;
-  }
+  // if (!isAuthenticated) {
+  //   // Redirect to login, save current location để redirect back sau khi login
+  //   return <Navigate to={redirectTo} state={{ from: location }} replace />;
+  // }
 
-  // Check role-based access
-  if (allowedRoles && allowedRoles.length > 0) {
-    const hasPermission = hasAnyRole(allowedRoles);
+  // // Check role-based access
+  // if (allowedRoles && allowedRoles.length > 0) {
+  //   const hasPermission = hasAnyRole(allowedRoles);
 
-    if (!hasPermission) {
-      return forbiddenFallback || <Navigate to="/forbidden" replace />;
-    }
-  }
+  //   if (!hasPermission) {
+  //     return forbiddenFallback || <Navigate to="/forbidden" replace />;
+  //   }
+  // }
 
   // User is authenticated và có quyền - render child routes
   return <Outlet />;
