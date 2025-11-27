@@ -13,7 +13,13 @@ import { useNavigate } from "react-router-dom";
 import { authApi } from "@/features/auth/api";
 import { useAppDispatch } from "@/stores/hooks";
 
-export const SessionExpiredHandler = () => {
+interface SessionExpiredHandlerProps {
+  children: React.ReactNode;
+}
+
+export const SessionExpiredHandler = ({
+  children,
+}: SessionExpiredHandlerProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -55,5 +61,6 @@ export const SessionExpiredHandler = () => {
     };
   }, [dispatch, navigate]);
 
-  return null; // No UI
+  // Render các component con (chính là <Outlet />)
+  return <>{children}</>;
 };
