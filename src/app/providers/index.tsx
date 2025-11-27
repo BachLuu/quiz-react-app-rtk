@@ -4,10 +4,9 @@
  */
 
 import { store } from "@/stores";
-import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Provider as ReduxProvider } from "react-redux";
-import { theme } from "../theme";
 import { AuthProvider } from "./AuthProvider";
+import { CustomThemeProvider } from "./CustomThemeProvider";
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -15,16 +14,14 @@ interface AppProviderProps {
 
 /**
  * AppProvider - Root provider cho toàn bộ app
- * Order matters: Redux -> Auth -> SessionExpiredHandler -> Theme -> Children
+ * Chứa các provider "toàn cục", không phụ thuộc vào router.
+ * Order matters: Redux -> Auth -> Theme -> Children
  */
 export const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <ReduxProvider store={store}>
       <AuthProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
+        <CustomThemeProvider>{children}</CustomThemeProvider>
       </AuthProvider>
     </ReduxProvider>
   );

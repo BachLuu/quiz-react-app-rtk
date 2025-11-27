@@ -47,9 +47,6 @@ const baseQueryWithReauth: typeof baseQuery = async (
       console.log("[Auth] User not authenticated - /auth/me returned 401");
       return { data: null }; // Return null instead of error
     }
-
-    // Other errors (500, etc.) - return original error
-    console.error("[Auth] /auth/me failed with error:", result.error);
     return result;
   }
 
@@ -64,6 +61,7 @@ const baseQueryWithReauth: typeof baseQuery = async (
     console.log("[Auth] Access token expired, attempting refresh...");
 
     // Attempt to refresh token
+    //TODO - Set const variable to url
     const refreshResult = await baseQuery(
       { url: "/auth/refresh", method: "POST" },
       api,
@@ -104,11 +102,11 @@ const baseQueryWithReauth: typeof baseQuery = async (
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Auth", "User", "Quiz", "Question"], // Cache tags
+  tagTypes: ["Auth", "User", "Quiz", "Question", "Role"], // Cache tags
   endpoints: () => ({}), // Empty - features sẽ inject endpoints
 });
 
-//-------------------Private Helpers Functions-------------------//
+//-------------------@BachLuu Private Helpers Functions-------------------//
 /**
  * Helper: Extract endpoint URL from args
  */

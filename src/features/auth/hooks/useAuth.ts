@@ -25,7 +25,6 @@ import type {
 /**
  * Main Auth Hook
  * Provides tất cả auth-related functionality
- * STUB - Hỏi AI về hook useAuth() mỗi khi nó được chạy trong 1 component
  */
 export const useAuth = () => {
   const navigate = useNavigate();

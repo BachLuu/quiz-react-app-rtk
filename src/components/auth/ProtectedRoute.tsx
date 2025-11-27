@@ -3,9 +3,9 @@
  * Best practice: Higher-Order Component để protect routes cần authentication
  */
 
-import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/auth";
 import { Box, CircularProgress } from "@mui/material";
+import { Outlet, useLocation } from "react-router-dom";
 
 interface ProtectedRouteProps {
   /**
