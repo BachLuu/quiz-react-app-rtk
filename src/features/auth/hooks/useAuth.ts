@@ -86,9 +86,9 @@ export const useAuth = () => {
    */
   const login = useCallback(
     async (credentials: LoginRequest) => {
-      // const response = await loginMutation(credentials).unwrap();
-      navigate("/dashboard");
-      // return response;
+      const response = await loginMutation(credentials).unwrap();
+      navigate("/home");
+      return response;
     },
     [loginMutation, navigate]
   );
@@ -101,7 +101,7 @@ export const useAuth = () => {
   const register = useCallback(
     async (userData: RegisterRequest) => {
       const response = await registerMutation(userData).unwrap();
-      navigate("/dashboard");
+      navigate("/home");
       return response;
     },
     [registerMutation, navigate]

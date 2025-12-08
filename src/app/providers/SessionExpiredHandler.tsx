@@ -11,7 +11,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "@/features/auth/api";
-import { useAppDispatch } from "@/stores/hooks";
+import { useAppDispatch } from "@/shared/stores/hooks";
 
 interface SessionExpiredHandlerProps {
   children: React.ReactNode;
@@ -39,7 +39,7 @@ export const SessionExpiredHandler = ({
 
       console.log("[SessionExpiredHandler] Session expired, cleaning up...");
 
-      // Clear RTK Query cache
+      // Clear RTK Query cach
       dispatch(authApi.util.resetApiState());
 
       // Navigate without hard reload (preserves Redux store structure)

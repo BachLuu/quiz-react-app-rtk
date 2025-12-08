@@ -3,14 +3,14 @@
  * Best practice: Centralized routing với role-based access control
  */
 
-import { ProtectedRoute, PublicRoute } from "@/components/auth";
-import { MainLayout } from "@/components/layouts/MainLayout";
+import { ProtectedRoute, PublicRoute } from "@/shared/components/auth";
+import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { ForbiddenPage, NotFoundPage } from ".";
 import App from "../App"; // Import App component
 import HomePage from "./protected/HomePage";
-import ManagementPage from "./protected/ManagementPage";
 import ProfilePage from "./protected/ProfilePage";
+import QuizManagementPage from "./protected/QuizManagementPage";
 import { LoginPage } from "./public/LoginPage";
 import { RegisterPage } from "./public/RegisterPage";
 
@@ -60,7 +60,12 @@ export const router = createBrowserRouter([
               },
               {
                 path: "/management",
-                element: <ManagementPage />,
+                children: [
+                  {
+                    path: "/management/quizzes",
+                    element: <QuizManagementPage />,
+                  },
+                ],
               },
               {
                 path: "/profile",

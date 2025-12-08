@@ -3,10 +3,10 @@
  * Best practice: Compose tất cả providers ở đây
  */
 
-import { store } from "@/stores";
+import { store } from "@/shared/stores";
 import { Provider as ReduxProvider } from "react-redux";
-import { AuthProvider } from "./AuthProvider";
 import { CustomThemeProvider } from "./CustomThemeProvider";
+import { ToastProvider } from "./ToastProvider";
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -15,14 +15,15 @@ interface AppProviderProps {
 /**
  * AppProvider - Root provider cho toàn bộ app
  * Chứa các provider "toàn cục", không phụ thuộc vào router.
- * Order matters: Redux -> Auth -> Theme -> Children
+ * Order matters: Redux -> Theme -> Toast -> Children
+ * Note: AuthProvider đã được chuyển vào trong App.tsx để support useNavigate
  */
 export const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <ReduxProvider store={store}>
-      <AuthProvider>
-        <CustomThemeProvider>{children}</CustomThemeProvider>
-      </AuthProvider>
+      <CustomThemeProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </CustomThemeProvider>
     </ReduxProvider>
   );
 };

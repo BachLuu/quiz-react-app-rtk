@@ -1,5 +1,9 @@
-import { api } from "@/services";
-import type { Quiz, CreateQuizDto, UpdateQuizDto } from "@/types/quiz";
+import type {
+  CreateQuizDto,
+  UpdateQuizDto,
+} from "@/features/management/quiz/types";
+import { api } from "@/shared/services";
+import type { Quiz } from "@/shared/types/quiz";
 
 /**
  * Quiz API endpoints
@@ -33,7 +37,7 @@ export const quizApi = api.injectEndpoints({
         url: `/quizzes/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: "Quiz", id }],
+      providesTags: (_result, _error, id) => [{ type: "Quiz", id }],
     }),
 
     /**
@@ -59,7 +63,7 @@ export const quizApi = api.injectEndpoints({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: "Quiz", id },
         { type: "Quiz", id: "LIST" },
       ],
@@ -74,7 +78,7 @@ export const quizApi = api.injectEndpoints({
         url: `/quizzes/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: "Quiz", id },
         { type: "Quiz", id: "LIST" },
       ],
@@ -93,7 +97,7 @@ export const quizApi = api.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: "Quiz", id },
         { type: "Quiz", id: "LIST" },
       ],
