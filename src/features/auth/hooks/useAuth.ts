@@ -7,13 +7,11 @@
  * - Error handling: chỉ hiển thị lỗi từ user actions, bỏ qua 401 từ /auth/me
  */
 
-import { useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import {
-  useLoginMutation,
-  useRegisterMutation,
-  useLogoutMutation,
   useGetCurrentUserQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
   useUpdateProfileMutation,
 } from "@/features/auth/api";
 import type {
@@ -21,6 +19,8 @@ import type {
   RegisterRequest,
   UpdateProfileRequest,
 } from "@/features/auth/types";
+import { useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Main Auth Hook
@@ -44,7 +44,6 @@ export const useAuth = () => {
   const {
     data: user,
     isLoading: isLoadingUser,
-    error: userError,
     refetch: refetchUser,
   } = useGetCurrentUserQuery();
 
@@ -56,20 +55,16 @@ export const useAuth = () => {
   // Combine loading states from mutations and query
   const isLoading = isLoginLoading || isRegisterLoading || isLoadingUser;
 
-  // Filter errors: chỉ hiển thị lỗi từ mutations, bỏ qua 401 từ getCurrentUser
+  // Filter errors: chỉ hiển thị lỗi từ mutations (Login/Register)
+  // Không hiển thị lỗi từ getCurrentUser (/auth/me) ở đây vì:
+  // 1. Lỗi 401/403 là trạng thái bình thường (chưa login)
+  // 2. Lỗi 500/Network đã được AuthProvider xử lý (hoặc bỏ qua nếu ở trang Login)
+  // 3. Tránh hiển thị thông báo lỗi đỏ lòm khi user vừa vào trang Login
   const error = useMemo(() => {
-    // Prioritize mutation errors (login/register)
     if (loginError) return loginError;
     if (registerError) return registerError;
-
-    // Ignore 401 from getCurrentUser (normal state when not logged in)
-    if (userError && "status" in userError && userError.status === 401) {
-      return null;
-    }
-
-    // Show other errors from getCurrentUser (500, network errors, etc.)
-    return userError || null;
-  }, [loginError, registerError, userError]);
+    return null;
+  }, [loginError, registerError]);
 
   // --- Actions ---
 
