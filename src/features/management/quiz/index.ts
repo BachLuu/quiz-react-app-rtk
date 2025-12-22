@@ -5,7 +5,7 @@ export * from "./api/api";
 export * from "./components";
 
 // Hooks
-export { default as useQuiz } from "./hooks/useQuiz";
+export { default as useQuizManagement } from "./hooks/useQuizManagement";
 
 // Schemas
 export * from "./schemas/quiz.schema";
@@ -13,3 +13,5 @@ export * from "./schemas/quiz.schema";
 // Types
 export * from "./types";
 
+// Utils
+export * from "./utils";

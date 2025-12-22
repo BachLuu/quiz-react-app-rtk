@@ -26,6 +26,7 @@
     "react-hook-form": "^7.66.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.5",
+    "react-snowfall": "^2.4.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

@@ -17,7 +17,6 @@
     "jsx": "react-jsx",
 
     /* Path mapping */
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -32,6 +31,6 @@
     "incremental": true,
     "composite": true
   },
-  "include": ["src/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "build", "dist", "**/*.spec.ts"]
 }

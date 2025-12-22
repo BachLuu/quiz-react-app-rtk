@@ -1,14 +1,9 @@
-import type { Quiz } from "../quiz/quiz.model";
-import type { Role } from "../role/role.model";
-
-export interface User {
+export type User = {
   firstName: string;
   lastName: string;
   email: string;
   avatar?: string | null;
-  dateOfBirth?: string | null; // convert LocalDate -> string
+  dateOfBirth?: string | null;
   isActive: boolean;
-  createdAt: string; // LocalDateTime -> string ISO
-  roles: Role[]; // type ở dưới
-  quizzes: Quiz[];
-}
+  createdAt: string;
+};

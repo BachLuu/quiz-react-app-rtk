@@ -1,28 +1,44 @@
+import { useToast } from "@/app/providers/ToastProvider";
+import type {
+  QuizDetail,
+  UseQuizParams,
+} from "@/features/management/quiz/types";
+import {
+  mapPagedQuizSummaries,
+  mapToQuizDetail,
+} from "@/features/management/quiz/utils/mapper";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useCreateQuizMutation,
   useDeleteQuizMutation,
-  useGetQuizzesQuery,
+  useGetPagedQuizzesQuery,
+  useLazyGetQuizByIdQuery,
   useUpdateQuizMutation,
 } from "../api/api";
-import type { CreateQuizDto, UpdateQuizDto } from "../types";
-import { useToast } from "@/app/providers/ToastProvider";
+import type { CreateQuizRequest, UpdateQuizRequest } from "../types";
 
 /**
  * useQuiz Hook
  * Façade hook for Quiz CRUD operations with toast notifications
  */
-const useQuiz = () => {
+
+const useQuizManagement = ({ page, size }: UseQuizParams) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
   // Queries
   const {
-    data: quizzes,
+    data: quizzesDto,
     isLoading: isLoadingQuizzes,
     error: getQuizzesError,
     refetch: refetchQuizzes,
-  } = useGetQuizzesQuery();
+  } = useGetPagedQuizzesQuery({ page, size });
+
+  const quizzes = useMemo(
+    () => mapPagedQuizSummaries(quizzesDto),
+    [quizzesDto]
+  );
 
   // Mutations
   const [
@@ -40,12 +56,17 @@ const useQuiz = () => {
     { isLoading: isDeletingQuiz, error: deleteQuizError },
   ] = useDeleteQuizMutation();
 
+  const [
+    getQuizByIdTrigger,
+    { isFetching: isLoadingQuizDetail, error: getQuizDetailError },
+  ] = useLazyGetQuizByIdQuery();
+
   /**
    * Create a new quiz
    * Shows success/error toast and navigates on success
    */
   const handleCreateQuiz = async (
-    quizData: CreateQuizDto
+    quizData: CreateQuizRequest
   ): Promise<boolean> => {
     try {
       const newQuiz = await createQuizMutation(quizData).unwrap();
@@ -65,7 +86,7 @@ const useQuiz = () => {
    */
   const handleUpdateQuiz = async (
     quizId: string,
-    quizData: UpdateQuizDto
+    quizData: UpdateQuizRequest
   ): Promise<boolean> => {
     try {
       await updateQuizMutation({ id: quizId, data: quizData }).unwrap();
@@ -94,28 +115,46 @@ const useQuiz = () => {
     }
   };
 
+  const handleViewQuizDetail = useCallback(
+    async (quizId: string): Promise<QuizDetail | undefined> => {
+      try {
+        // preferCacheValue=true keeps it snappy if already cached
+        const quizDetail = await getQuizByIdTrigger(quizId, true).unwrap();
+        return mapToQuizDetail(quizDetail);
+      } catch (error) {
+        console.error("Failed to get quiz details:", error);
+        showError("Failed to get quiz details. Please try again.");
+        return undefined;
+      }
+    },
+    [getQuizByIdTrigger, showError]
+  );
+
   return {
     // DATA
-    quizzes: quizzes ?? [],
+    quizzes,
 
     // LOADING STATES
     isLoadingQuizzes,
     isCreatingQuiz,
     isUpdatingQuiz,
     isDeletingQuiz,
+    isLoadingQuizDetail,
 
     // ERROR STATES
     getQuizzesError,
     createQuizError,
     updateQuizError,
     deleteQuizError,
+    getQuizDetailError,
 
     // ACTIONS
     handleCreateQuiz,
     handleUpdateQuiz,
     handleDeleteQuiz,
+    handleViewQuizDetail,
     refetchQuizzes,
   };
 };
 
-export default useQuiz;
+export default useQuizManagement;

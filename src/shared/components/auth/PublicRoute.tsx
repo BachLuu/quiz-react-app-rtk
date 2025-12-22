@@ -27,9 +27,7 @@ interface PublicRouteProps {
  * </Route>
  * ```
  */
-export const PublicRoute = ({
-  redirectTo = "/dashboard",
-}: PublicRouteProps) => {
+export const PublicRoute = ({ redirectTo = "/home" }: PublicRouteProps) => {
   const { isAuthenticated } = useAuth();
 
   // Nếu đã login, redirect về dashboard

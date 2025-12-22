@@ -1,9 +1,12 @@
 import { useAuth } from "@/features/auth/hooks";
+import { Logout } from "@mui/icons-material";
 import {
   Avatar,
   Box,
+  IconButton,
   ListItemButton,
   ListItemIcon,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,7 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 export const ProfileSectionSideBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout: useLogOutMutation } = useAuth();
 
   return (
     <Box sx={{ p: 2 }}>
@@ -72,6 +75,23 @@ export const ProfileSectionSideBar = () => {
             {user?.email || "user@email.com"}
           </Typography>
         </Box>
+        <ListItemIcon
+          sx={{ minWidth: 40, display: "flex", justifyContent: "flex-end" }}
+        >
+          <Tooltip title="Logout">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                useLogOutMutation();
+              }}
+              sx={{ color: "inherit" }}
+            >
+              <Logout fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </ListItemIcon>
       </ListItemButton>
     </Box>
   );

@@ -1,10 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { api } from "@/shared/services/api";
+import quizUiReducer from "@/features/management/quiz/stores/slice";
+import managementUserUiReducer from "@/features/management/user/stores/slice";
 
 export const store = configureStore({
   reducer: {
-    // Add RTK Query API reducer
     [api.reducerPath]: api.reducer,
+    managementQuizUi: quizUiReducer,
+    managementUserUi: managementUserUiReducer,
   },
   // Add RTK Query middleware
   middleware: (getDefaultMiddleware) =>

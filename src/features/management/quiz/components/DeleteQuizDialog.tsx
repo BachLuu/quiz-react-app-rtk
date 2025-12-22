@@ -7,13 +7,14 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import type { Quiz } from "@/shared/types/quiz";
+
+import type { QuizSummary } from "../types";
 
 interface DeleteQuizDialogProps {
   /** Whether the dialog is open */
   open: boolean;
   /** The quiz to delete */
-  quiz: Quiz | null;
+  quiz: QuizSummary | null;
   /** Whether delete is in progress */
   isDeleting?: boolean;
   /** Callback when dialog is closed */
