@@ -2,17 +2,26 @@ import { useNavigate } from "react-router-dom";
 import {
   useCreateQuizMutation,
   useDeleteQuizMutation,
-  useGetQuizzesQuery,
+  useGetPagedQuizzesQuery,
+  useLazyGetQuizByIdQuery,
   useUpdateQuizMutation,
 } from "../api/api";
-import type { CreateQuizDto, UpdateQuizDto } from "../types";
+import type { CreateQuizDto, UpdateQuizDto, QuizDetailDto } from "../types";
 import { useToast } from "@/app/providers/ToastProvider";
+import { useCallback } from "react";
+import type { Page } from "@/shared/types/page";
+import type { QuizViewDto } from "../types";
 
 /**
  * useQuiz Hook
  * Façade hook for Quiz CRUD operations with toast notifications
  */
-const useQuiz = () => {
+type UseQuizParams = {
+  page: number;
+  size: number;
+};
+
+const useQuiz = ({ page, size }: UseQuizParams) => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
@@ -22,7 +31,7 @@ const useQuiz = () => {
     isLoading: isLoadingQuizzes,
     error: getQuizzesError,
     refetch: refetchQuizzes,
-  } = useGetQuizzesQuery();
+  } = useGetPagedQuizzesQuery({ page, size });
 
   // Mutations
   const [
@@ -39,6 +48,11 @@ const useQuiz = () => {
     deleteQuizMutation,
     { isLoading: isDeletingQuiz, error: deleteQuizError },
   ] = useDeleteQuizMutation();
+
+  const [
+    getQuizByIdTrigger,
+    { isFetching: isLoadingQuizDetail, error: getQuizDetailError },
+  ] = useLazyGetQuizByIdQuery();
 
   /**
    * Create a new quiz
@@ -94,26 +108,44 @@ const useQuiz = () => {
     }
   };
 
+  const handleViewQuizDetail = useCallback(
+    async (quizId: string): Promise<QuizDetailDto | undefined> => {
+      try {
+        // preferCacheValue=true keeps it snappy if already cached
+        const quizDetail = await getQuizByIdTrigger(quizId, true).unwrap();
+        return quizDetail;
+      } catch (error) {
+        console.error("Failed to get quiz details:", error);
+        showError("Failed to get quiz details. Please try again.");
+        return undefined;
+      }
+    },
+    [getQuizByIdTrigger, showError]
+  );
+
   return {
     // DATA
-    quizzes: quizzes ?? [],
+    quizzes: quizzes as Page<QuizViewDto> | undefined,
 
     // LOADING STATES
     isLoadingQuizzes,
     isCreatingQuiz,
     isUpdatingQuiz,
     isDeletingQuiz,
+    isLoadingQuizDetail,
 
     // ERROR STATES
     getQuizzesError,
     createQuizError,
     updateQuizError,
     deleteQuizError,
+    getQuizDetailError,
 
     // ACTIONS
     handleCreateQuiz,
     handleUpdateQuiz,
     handleDeleteQuiz,
+    handleViewQuizDetail,
     refetchQuizzes,
   };
 };

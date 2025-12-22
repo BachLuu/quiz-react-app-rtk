@@ -1,5 +1,5 @@
 import type { Question } from "../question";
-import type { User } from "../user/user.model";
+import type { User } from "../user";
 
 export interface Quiz {
   id: string;

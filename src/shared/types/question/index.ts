@@ -1,1 +1,1 @@
-export * from "./question.models";
+export * from "./question.model";

@@ -1,5 +1,5 @@
-import type { Quiz } from "../quiz/quiz.model";
-import type { Role } from "../role/role.model";
+import type { Quiz } from "../quiz";
+import type { Role } from "../role";
 
 export interface User {
   firstName: string;

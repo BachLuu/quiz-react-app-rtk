@@ -8,6 +8,7 @@
  */
 
 import {
+  authApi,
   useGetCurrentUserQuery,
   useLoginMutation,
   useLogoutMutation,
@@ -19,6 +20,7 @@ import type {
   RegisterRequest,
   UpdateProfileRequest,
 } from "@/features/auth/types";
+import { useAppDispatch } from "@/shared/stores/hooks";
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,6 +30,7 @@ import { useNavigate } from "react-router-dom";
  */
 export const useAuth = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   // --- RTK Query Mutations ---
   const [loginMutation, { isLoading: isLoginLoading, error: loginError }] =
@@ -82,7 +85,6 @@ export const useAuth = () => {
   const login = useCallback(
     async (credentials: LoginRequest) => {
       const response = await loginMutation(credentials).unwrap();
-      navigate("/home");
       return response;
     },
     [loginMutation, navigate]
@@ -96,7 +98,6 @@ export const useAuth = () => {
   const register = useCallback(
     async (userData: RegisterRequest) => {
       const response = await registerMutation(userData).unwrap();
-      navigate("/home");
       return response;
     },
     [registerMutation, navigate]
@@ -112,11 +113,10 @@ export const useAuth = () => {
     } catch (err) {
       console.error("Logout API error:", err);
     } finally {
-      // RTK Query tự động invalidate cache "User"
-      // Redirect to login
-      navigate("/login");
+      dispatch(authApi.util.resetApiState());
+      navigate("/login", { replace: true });
     }
-  }, [logoutMutation, navigate]);
+  }, [dispatch, logoutMutation, navigate]);
 
   /**
    * Update profile
