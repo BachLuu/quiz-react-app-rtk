@@ -1,26 +1,14 @@
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
-import type { Quiz } from "@/shared/types/quiz";
 
-interface DeleteQuizDialogProps {
-  /** Whether the dialog is open */
-  open: boolean;
-  /** The quiz to delete */
-  quiz: Quiz | null;
-  /** Whether delete is in progress */
-  isDeleting?: boolean;
-  /** Callback when dialog is closed */
-  onClose: () => void;
-  /** Callback when delete is confirmed */
-  onConfirm: () => void;
-}
+import type { DeleteQuizDialogProps } from "../types/ui";
 
 /**
  * DeleteQuizDialog Component

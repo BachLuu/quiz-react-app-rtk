@@ -1,38 +1,21 @@
 import type {
-  CreateQuizDto,
-  UpdateQuizDto,
+  CreateQuizRequest,
+  QuizDetailResponse,
+  UpdateQuizRequest,
 } from "@/features/management/quiz/types";
-import { api } from "@/shared/services";
+import { api } from "@/shared/api";
 import type { Quiz } from "@/shared/types/quiz";
 
 /**
  * Quiz API endpoints
  * Best practice: Full CRUD operations with proper tags for cache invalidation
  */
-export const quizApi = api.injectEndpoints({
+const quizManagementApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    /**
-     * Get all quizzes
-     * Provides tag "Quiz" for automatic cache invalidation
-     */
-    getQuizzes: builder.query<Quiz[], void>({
-      query: () => ({
-        url: "/quizzes",
-        method: "GET",
-      }),
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ id }) => ({ type: "Quiz" as const, id })),
-              { type: "Quiz", id: "LIST" },
-            ]
-          : [{ type: "Quiz", id: "LIST" }],
-    }),
-
     /**
      * Get single quiz by ID
      */
-    getQuizById: builder.query<Quiz, string>({
+    getQuizById: builder.query<QuizDetailResponse, string>({
       query: (id) => ({
         url: `/quizzes/${id}`,
         method: "GET",
@@ -44,7 +27,7 @@ export const quizApi = api.injectEndpoints({
      * Create new quiz
      * Invalidates "Quiz" list cache after successful creation
      */
-    createQuiz: builder.mutation<Quiz, CreateQuizDto>({
+    createQuiz: builder.mutation<QuizDetailResponse, CreateQuizRequest>({
       query: (body) => ({
         url: "/quizzes",
         method: "POST",
@@ -57,7 +40,10 @@ export const quizApi = api.injectEndpoints({
      * Update existing quiz
      * Invalidates both the specific quiz and the list cache
      */
-    updateQuiz: builder.mutation<Quiz, { id: string; data: UpdateQuizDto }>({
+    updateQuiz: builder.mutation<
+      QuizDetailResponse,
+      { id: string; data: UpdateQuizRequest }
+    >({
       query: ({ id, data }) => ({
         url: `/quizzes/${id}`,
         method: "PUT",
@@ -90,7 +76,7 @@ export const quizApi = api.injectEndpoints({
      */
     patchQuiz: builder.mutation<
       Quiz,
-      { id: string; data: Partial<UpdateQuizDto> }
+      { id: string; data: Partial<UpdateQuizRequest> }
     >({
       query: ({ id, data }) => ({
         url: `/quizzes/${id}`,
@@ -110,10 +96,10 @@ export const quizApi = api.injectEndpoints({
  * Best practice: Export hooks for easy usage in React components
  */
 export const {
-  useGetQuizzesQuery,
   useGetQuizByIdQuery,
+  useLazyGetQuizByIdQuery,
   useCreateQuizMutation,
   useUpdateQuizMutation,
   useDeleteQuizMutation,
   usePatchQuizMutation,
-} = quizApi;
+} = quizManagementApi;

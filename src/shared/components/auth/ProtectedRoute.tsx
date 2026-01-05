@@ -4,32 +4,9 @@
  */
 
 import { useAuth } from "@/features/auth";
+import type { ProtectedRouteProps } from "@/shared/types";
 import { Box, CircularProgress } from "@mui/material";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-
-interface ProtectedRouteProps {
-  /**
-   * Component sẽ render khi user chưa authenticate
-   * Default: redirect to /login
-   */
-  redirectTo?: string;
-
-  /**
-   * Roles được phép access route này
-   * Nếu undefined, chỉ cần authenticate là được
-   */
-  allowedRoles?: string[];
-
-  /**
-   * Custom fallback component khi loading
-   */
-  loadingFallback?: React.ReactNode;
-
-  /**
-   * Custom fallback component khi không có quyền
-   */
-  forbiddenFallback?: React.ReactNode;
-}
 
 /**
  * ProtectedRoute - Bảo vệ routes cần authentication

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+quiz-react-app.code-workspace
+.github/copilot-instructions.md
+requirement.txt

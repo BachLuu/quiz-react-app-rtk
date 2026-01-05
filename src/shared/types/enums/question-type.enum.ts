@@ -1,7 +1,14 @@
-export const QuestionTypeEnum = {
-  BEGINNER: "BEGINNER",
-  INTERMEDIATE: "INTERMEDIATE",
-  ADVANCED: "ADVANCED"
-} as const;
+/**
+ * Question difficulty levels
+ * Use union type instead of const enum for better tree-shaking
+ */
+export type QuestionType = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
 
-export type QuestionTypeEnum = typeof QuestionTypeEnum[keyof typeof QuestionTypeEnum];
+/**
+ * Helper array for runtime validation (optional)
+ */
+export const QUESTION_TYPES: readonly QuestionType[] = [
+  "BEGINNER",
+  "INTERMEDIATE",
+  "ADVANCED",
+] as const;

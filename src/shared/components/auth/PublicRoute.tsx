@@ -4,16 +4,9 @@
  * Ví dụ: Login, Register pages - nếu đã login thì redirect về dashboard
  */
 
-import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/features/auth";
-
-interface PublicRouteProps {
-  /**
-   * Redirect đến đâu nếu user đã authenticated
-   * Default: /dashboard
-   */
-  redirectTo?: string;
-}
+import type { PublicRouteProps } from "@/shared/types";
+import { Navigate, Outlet } from "react-router-dom";
 
 /**
  * PublicRoute - Routes cho users chưa login
@@ -27,9 +20,7 @@ interface PublicRouteProps {
  * </Route>
  * ```
  */
-export const PublicRoute = ({
-  redirectTo = "/dashboard",
-}: PublicRouteProps) => {
+export const PublicRoute = ({ redirectTo = "/home" }: PublicRouteProps) => {
   const { isAuthenticated } = useAuth();
 
   // Nếu đã login, redirect về dashboard

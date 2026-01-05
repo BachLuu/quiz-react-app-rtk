@@ -16,15 +16,43 @@ import {
   QuizList,
   DeleteQuizDialog,
 } from "../../../features/management/quiz/components";
-import useQuiz from "../../../features/management/quiz/hooks/useQuiz";
+import useQuizManagement from "../../../features/management/quiz/hooks/useQuizManagement";
 import type { CreateQuizFormData } from "../../../features/management/quiz/schemas/quiz.schema";
-import type { Quiz } from "@/shared/types/quiz";
+import type {
+  QuizDetail,
+  QuizSummary,
+} from "../../../features/management/quiz/types";
+import { mapQuizToFormValues } from "@/features/management/quiz/utils/mapper";
+import {
+  closeDeleteDialog,
+  closeFormDialog,
+  openDeleteDialog,
+  openFormDialog,
+  selectQuizUiDeleteDialogOpen,
+  selectQuizUiDialogMode,
+  selectQuizUiFormDialogOpen,
+  selectQuizUiPage,
+  selectQuizUiRowsPerPage,
+  selectQuizUiSelectedQuizId,
+  setPage,
+  setRowsPerPage,
+} from "@/features/management/quiz/stores/slice";
+import { useAppDispatch, useAppSelector } from "@/shared/stores/hooks";
 
 /**
  * QuizManagementPage
  * Main page for managing quizzes (CRUD operations)
  */
 export const QuizManagementPage = () => {
+  const dispatch = useAppDispatch();
+
+  const page = useAppSelector(selectQuizUiPage);
+  const rowsPerPage = useAppSelector(selectQuizUiRowsPerPage);
+  const isFormDialogOpen = useAppSelector(selectQuizUiFormDialogOpen);
+  const isDeleteDialogOpen = useAppSelector(selectQuizUiDeleteDialogOpen);
+  const dialogMode = useAppSelector(selectQuizUiDialogMode);
+  const selectedQuizId = useAppSelector(selectQuizUiSelectedQuizId);
+
   // Quiz hook with CRUD operations
   const {
     quizzes,
@@ -32,55 +60,53 @@ export const QuizManagementPage = () => {
     isCreatingQuiz,
     isUpdatingQuiz,
     isDeletingQuiz,
+    isLoadingQuizDetail,
     handleCreateQuiz,
+    handleViewQuizDetail,
     handleUpdateQuiz,
     handleDeleteQuiz,
-  } = useQuiz();
+  } = useQuizManagement({ page, size: rowsPerPage });
 
-  // Dialog states
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedQuizDetail, setSelectedQuizDetail] =
+    useState<QuizDetail | null>(null);
+
+  const selectedQuiz: QuizSummary | undefined = quizzes?.content.find(
+    (quiz) => quiz.id === selectedQuizId
+  );
 
   // Open create dialog
   const handleOpenCreateDialog = () => {
-    setSelectedQuiz(null);
-    setIsEditMode(false);
-    setIsFormDialogOpen(true);
+    setSelectedQuizDetail(null);
+    dispatch(openFormDialog({ mode: "create", quizId: null }));
   };
 
   // Open edit dialog
-  const handleOpenEditDialog = (quiz: Quiz) => {
-    setSelectedQuiz(quiz);
-    setIsEditMode(true);
-    setIsFormDialogOpen(true);
+  const handleOpenEditDialog = (quiz: QuizSummary) => {
+    setSelectedQuizDetail(null);
+    dispatch(openFormDialog({ mode: "edit", quizId: quiz.id }));
   };
 
   // Close form dialog
   const handleCloseFormDialog = () => {
-    setIsFormDialogOpen(false);
-    setSelectedQuiz(null);
-    setIsEditMode(false);
+    setSelectedQuizDetail(null);
+    dispatch(closeFormDialog());
   };
 
   // Open delete dialog
-  const handleOpenDeleteDialog = (quiz: Quiz) => {
-    setSelectedQuiz(quiz);
-    setIsDeleteDialogOpen(true);
+  const handleOpenDeleteDialog = (quiz: QuizSummary) => {
+    dispatch(openDeleteDialog({ quizId: quiz.id }));
   };
 
   // Close delete dialog
   const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
-    setSelectedQuiz(null);
+    dispatch(closeDeleteDialog());
   };
 
   // Handle form submit (create or update)
   const handleFormSubmit = async (data: CreateQuizFormData) => {
     let success = false;
 
-    if (isEditMode && selectedQuiz) {
+    if (dialogMode === "edit" && selectedQuiz) {
       success = await handleUpdateQuiz(selectedQuiz.id, data);
     } else {
       success = await handleCreateQuiz(data);
@@ -102,10 +128,25 @@ export const QuizManagementPage = () => {
   };
 
   // View quiz details (navigate to detail page)
-  const handleViewQuiz = (quiz: Quiz) => {
-    // TODO: Navigate to quiz detail page
-    console.log("View quiz:", quiz.id);
+  const handleViewQuiz = async (quiz: QuizSummary) => {
+    setSelectedQuizDetail(null);
+    dispatch(openFormDialog({ mode: "view", quizId: quiz.id }));
+
+    const detail = await handleViewQuizDetail(quiz.id);
+    if (!detail) {
+      handleCloseFormDialog();
+      return;
+    }
+
+    setSelectedQuizDetail(detail);
   };
+
+  const dialogTitle =
+    dialogMode === "edit"
+      ? "Edit Quiz"
+      : dialogMode === "view"
+      ? "Quiz Detail"
+      : "Create New Quiz";
 
   return (
     <Box sx={{ p: 3 }}>
@@ -135,6 +176,10 @@ export const QuizManagementPage = () => {
         <QuizList
           quizzes={quizzes}
           isLoading={isLoadingQuizzes}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(next) => dispatch(setPage(next))}
+          onRowsPerPageChange={(next) => dispatch(setRowsPerPage(next))}
           onView={handleViewQuiz}
           onEdit={handleOpenEditDialog}
           onDelete={handleOpenDeleteDialog}
@@ -156,10 +201,10 @@ export const QuizManagementPage = () => {
               alignItems: "center",
             }}
           >
-            {isEditMode ? "Edit Quiz" : "Create New Quiz"}
+            {dialogTitle}
             <IconButton
               onClick={handleCloseFormDialog}
-              disabled={isCreatingQuiz || isUpdatingQuiz}
+              disabled={isCreatingQuiz || isUpdatingQuiz || isLoadingQuizDetail}
             >
               <CloseIcon />
             </IconButton>
@@ -168,10 +213,22 @@ export const QuizManagementPage = () => {
         <DialogContent>
           <Box sx={{ pt: 1 }}>
             <QuizForm
-              initialData={selectedQuiz ?? undefined}
-              onSubmit={handleFormSubmit}
-              isSubmitting={isCreatingQuiz || isUpdatingQuiz}
-              submitButtonText={isEditMode ? "Update" : "Create"}
+              mode={dialogMode}
+              initialData={mapQuizToFormValues(
+                dialogMode === "edit" ? selectedQuiz : selectedQuizDetail
+              )}
+              detailData={
+                dialogMode === "view"
+                  ? selectedQuizDetail ?? undefined
+                  : undefined
+              }
+              onSubmit={dialogMode === "view" ? undefined : handleFormSubmit}
+              isSubmitting={
+                isCreatingQuiz ||
+                isUpdatingQuiz ||
+                (dialogMode === "view" && isLoadingQuizDetail)
+              }
+              submitButtonText={dialogMode === "edit" ? "Update" : "Create"}
               onCancel={handleCloseFormDialog}
             />
           </Box>
@@ -181,7 +238,7 @@ export const QuizManagementPage = () => {
       {/* Delete Confirmation Dialog */}
       <DeleteQuizDialog
         open={isDeleteDialogOpen}
-        quiz={selectedQuiz}
+        quiz={selectedQuiz ?? null}
         isDeleting={isDeletingQuiz}
         onClose={handleCloseDeleteDialog}
         onConfirm={handleDeleteConfirm}
