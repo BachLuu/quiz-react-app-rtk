@@ -3,7 +3,7 @@
  * Best practice: Inject endpoints vào base API từ services/api.ts
  */
 
-import { api } from "@/shared/services/api";
+import { api } from "@/shared/api/common/api";
 import type {
   LoginRequest,
   AuthResponse,

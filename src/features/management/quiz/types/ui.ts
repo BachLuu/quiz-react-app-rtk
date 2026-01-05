@@ -1,22 +1,11 @@
 import type { CreateQuizFormData } from "@/features/management/quiz/schemas/quiz.schema";
-import type { Page } from "@/shared/types/page";
+import type { Page, Quiz } from "@/shared/types";
+
+// Re-export Quiz from shared types as QuizSummary for backward compatibility
+export type QuizSummary = Quiz;
 
 export type ManagementQuizDialogMode = "create" | "edit" | "view";
 export type ManagementQuizFormMode = "create" | "edit" | "view";
-
-// UI-facing list model (already normalized for rendering)
-export type QuizSummary = {
-  id: string;
-  title: string;
-  description: string;
-  duration: number;
-  thumbnailUrl: string;
-  isActive: boolean;
-};
-export type UseQuizParams = {
-  page: number;
-  size: number;
-};
 
 // UI-facing detail model (includes counters)
 export type QuizDetail = {
@@ -73,3 +62,10 @@ export type QuizTableSortableColumnId = Exclude<
   QuizTableColumnId,
   "actions" | "index"
 >;
+export type DeleteQuizDialogProps = {
+  open: boolean;
+  quiz: QuizSummary | null;
+  isDeleting?: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+};

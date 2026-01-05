@@ -1,4 +1,5 @@
 export * from "./answer";
+export * from "./components";
 export * from "./enums";
 export * from "./page";
 export * from "./question";

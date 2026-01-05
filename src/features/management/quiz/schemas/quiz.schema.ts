@@ -43,7 +43,7 @@ export const createQuizSchema = z
   .strict();
 
 // Update schema - partial updates
-export const updateQuizSchema = createQuizSchema.partial().strict();
+export const updateQuizSchema = createQuizSchema.strict();
 
 // Infer TypeScript types from schemas
 export type CreateQuizFormData = z.infer<typeof createQuizSchema>;

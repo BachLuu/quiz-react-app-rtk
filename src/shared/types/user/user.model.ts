@@ -1,4 +1,5 @@
-export type User = {
+export interface User {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -6,4 +7,6 @@ export type User = {
   dateOfBirth?: string | null;
   isActive: boolean;
   createdAt: string;
-};
+  displayName: string;
+  roles: string[];
+}
