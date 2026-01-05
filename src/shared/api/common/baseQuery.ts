@@ -1,6 +1,15 @@
-// src/services/api.ts
+/**
+ * Base Query Configuration for RTK Query
+ * Handles authentication, token refresh, and error handling
+ */
+
 import { config } from "@/config";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  getEndpoint,
+  getLoginRedirectPath,
+  shouldSkipAuthRetry,
+} from "./helpers";
 
 /**
  * Base Query Configuration
@@ -14,6 +23,7 @@ const baseQuery = fetchBaseQuery({
     return headers;
   },
 });
+
 /**
  * Base Query with Re-authentication
  *
@@ -23,7 +33,7 @@ const baseQuery = fetchBaseQuery({
  * 3. Redirects to login if refresh fails
  * 4. Prevents infinite loops by skipping retry for auth endpoints
  */
-const baseQueryWithReauth: typeof baseQuery = async (
+export const baseQueryWithReauth: typeof baseQuery = async (
   args,
   api,
   extraOptions
@@ -61,7 +71,6 @@ const baseQueryWithReauth: typeof baseQuery = async (
     console.log("[Auth] Access token expired, attempting refresh...");
 
     // Attempt to refresh token
-    //TODO - Set const variable to url
     const refreshResult = await baseQuery(
       { url: "/auth/refresh", method: "POST" },
       api,
@@ -93,46 +102,4 @@ const baseQueryWithReauth: typeof baseQuery = async (
   }
 
   return result;
-};
-
-/**
- * Base API - Parent của tất cả API services
- * Best practice: Define base API một lần, inject vào features
- */
-export const api = createApi({
-  reducerPath: "api",
-  baseQuery: baseQueryWithReauth,
-  tagTypes: ["Auth", "User", "Quiz", "Question", "Role"], // Cache tags
-  endpoints: () => ({}), // Empty - features sẽ inject endpoints
-});
-
-//-------------------@BachLuu Private Helpers Functions-------------------//
-/**
- * Helper: Extract endpoint URL from args
- */
-const getEndpoint = (args: any): string => {
-  return typeof args === "string" ? args : args.url;
-};
-
-/**
- * Helper: Check if endpoint should skip auth retry to prevent infinite loops
- */
-const shouldSkipAuthRetry = (endpoint: string): boolean => {
-  const authEndpoints = [
-    "/auth/login",
-    "/auth/register",
-    "/auth/refresh",
-    "/auth/me",
-  ];
-  return authEndpoints.some((path) => endpoint.includes(path));
-};
-
-/**
- * Helper: Handle redirect to login with optional redirect parameter
- */
-const getLoginRedirectPath = (): string => {
-  const currentPath = window.location.pathname;
-  return currentPath !== "/login"
-    ? `/login?redirect=${encodeURIComponent(currentPath)}`
-    : "/login";
 };

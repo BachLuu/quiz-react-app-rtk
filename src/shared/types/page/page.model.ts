@@ -32,3 +32,8 @@ export interface Page<T> {
   totalElements: number;
   totalPages: number;
 }
+
+export interface PageParamsRequest {
+  page: number;
+  size: number;
+}

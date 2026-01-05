@@ -3,10 +3,10 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   OpenDeleteDialogPayload,
   OpenFormDialogPayload,
-  QuizUiState as ManagementQuizUiState,
+  QuizUiState as QuizManagementUiState,
 } from "./types";
 
-const initialState: ManagementQuizUiState = {
+const initialState: QuizManagementUiState = {
   formDialogOpen: false,
   deleteDialogOpen: false,
   dialogMode: "create",
@@ -15,8 +15,8 @@ const initialState: ManagementQuizUiState = {
   rowsPerPage: 10,
 };
 
-const managementQuizUiSlice = createSlice({
-  name: "managmentQuizUi",
+const quizManagementUiSlice = createSlice({
+  name: "quizManagementUi",
   initialState,
   reducers: {
     openFormDialog: (state, action: PayloadAction<OpenFormDialogPayload>) => {
@@ -48,7 +48,7 @@ const managementQuizUiSlice = createSlice({
     },
   },
 });
-
+//Actions
 export const {
   openFormDialog,
   closeFormDialog,
@@ -56,21 +56,20 @@ export const {
   closeDeleteDialog,
   setPage,
   setRowsPerPage,
-} = managementQuizUiSlice.actions;
+} = quizManagementUiSlice.actions;
 
 // Selectors
-export const selectQuizUi = (state: RootState) => state.managementQuizUi;
-export const selectQuizUiPage = (state: RootState) =>
-  state.managementQuizUi.page;
-export const selectQuizUiRowsPerPage = (state: RootState) =>
-  state.managementQuizUi.rowsPerPage;
-export const selectQuizUiFormDialogOpen = (state: RootState) =>
-  state.managementQuizUi.formDialogOpen;
-export const selectQuizUiDeleteDialogOpen = (state: RootState) =>
-  state.managementQuizUi.deleteDialogOpen;
-export const selectQuizUiDialogMode = (state: RootState) =>
-  state.managementQuizUi.dialogMode;
-export const selectQuizUiSelectedQuizId = (state: RootState) =>
-  state.managementQuizUi.selectedQuizId;
+export const selectQuizManagementUiPage = (state: RootState) =>
+  state.quizManagementUi.page;
+export const selectQuizManagementUiRowsPerPage = (state: RootState) =>
+  state.quizManagementUi.rowsPerPage;
+export const selectQuizManagementUiFormDialogOpen = (state: RootState) =>
+  state.quizManagementUi.formDialogOpen;
+export const selectQuizManagementUiDeleteDialogOpen = (state: RootState) =>
+  state.quizManagementUi.deleteDialogOpen;
+export const selectQuizManagementUiDialogMode = (state: RootState) =>
+  state.quizManagementUi.dialogMode;
+export const selectQuizManagementUiSelectedQuizId = (state: RootState) =>
+  state.quizManagementUi.selectedQuizId;
 
-export default managementQuizUiSlice.reducer;
+export default quizManagementUiSlice.reducer;

@@ -1,4 +1,4 @@
-export type Quiz = {
+export interface Quiz {
   id: string;
   title: string;
   description: string;
@@ -7,4 +7,4 @@ export type Quiz = {
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
-};
+}
