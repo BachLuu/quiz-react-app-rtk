@@ -1,18 +1,12 @@
 import { useToast } from "@/app/providers/ToastProvider";
-import type {
-  QuizDetail,
-  UseQuizParams,
-} from "@/features/management/quiz/types";
-import {
-  mapPagedQuizSummaries,
-  mapToQuizDetail,
-} from "@/features/management/quiz/utils/mapper";
-import { useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import type { QuizDetail } from "@/features/management/quiz/types";
+import { mapToQuizDetail } from "@/features/management/quiz/utils/mapper";
+import { useGetPagedQuizzesQuery } from "@/shared/api";
+import type { PageParamsRequest } from "@/shared/types/page";
+import { useCallback } from "react";
 import {
   useCreateQuizMutation,
   useDeleteQuizMutation,
-  useGetPagedQuizzesQuery,
   useLazyGetQuizByIdQuery,
   useUpdateQuizMutation,
 } from "../api/api";
@@ -23,43 +17,28 @@ import type { CreateQuizRequest, UpdateQuizRequest } from "../types";
  * Façade hook for Quiz CRUD operations with toast notifications
  */
 
-const useQuizManagement = ({ page, size }: UseQuizParams) => {
-  const navigate = useNavigate();
+const useQuizManagement = ({ page, size }: PageParamsRequest) => {
   const { showSuccess, showError } = useToast();
 
   // Queries
   const {
-    data: quizzesDto,
+    data: quizzes,
     isLoading: isLoadingQuizzes,
-    error: getQuizzesError,
     refetch: refetchQuizzes,
   } = useGetPagedQuizzesQuery({ page, size });
 
-  const quizzes = useMemo(
-    () => mapPagedQuizSummaries(quizzesDto),
-    [quizzesDto]
-  );
-
   // Mutations
-  const [
-    createQuizMutation,
-    { isLoading: isCreatingQuiz, error: createQuizError },
-  ] = useCreateQuizMutation();
+  const [createQuizMutation, { isLoading: isCreatingQuiz }] =
+    useCreateQuizMutation();
 
-  const [
-    updateQuizMutation,
-    { isLoading: isUpdatingQuiz, error: updateQuizError },
-  ] = useUpdateQuizMutation();
+  const [updateQuizMutation, { isLoading: isUpdatingQuiz }] =
+    useUpdateQuizMutation();
 
-  const [
-    deleteQuizMutation,
-    { isLoading: isDeletingQuiz, error: deleteQuizError },
-  ] = useDeleteQuizMutation();
+  const [deleteQuizMutation, { isLoading: isDeletingQuiz }] =
+    useDeleteQuizMutation();
 
-  const [
-    getQuizByIdTrigger,
-    { isFetching: isLoadingQuizDetail, error: getQuizDetailError },
-  ] = useLazyGetQuizByIdQuery();
+  const [getQuizByIdTrigger, { isFetching: isLoadingQuizDetail }] =
+    useLazyGetQuizByIdQuery();
 
   /**
    * Create a new quiz
@@ -69,9 +48,8 @@ const useQuizManagement = ({ page, size }: UseQuizParams) => {
     quizData: CreateQuizRequest
   ): Promise<boolean> => {
     try {
-      const newQuiz = await createQuizMutation(quizData).unwrap();
+      await createQuizMutation(quizData).unwrap();
       showSuccess("Quiz created successfully!");
-      navigate(`/management/quizzes/${newQuiz.id}`);
       return true;
     } catch (error) {
       console.error("Failed to create quiz:", error);
@@ -115,6 +93,7 @@ const useQuizManagement = ({ page, size }: UseQuizParams) => {
     }
   };
 
+  /* ------------------------Handle View Quiz Detail ------------------------------------------------- */
   const handleViewQuizDetail = useCallback(
     async (quizId: string): Promise<QuizDetail | undefined> => {
       try {
@@ -133,21 +112,12 @@ const useQuizManagement = ({ page, size }: UseQuizParams) => {
   return {
     // DATA
     quizzes,
-
     // LOADING STATES
     isLoadingQuizzes,
     isCreatingQuiz,
     isUpdatingQuiz,
     isDeletingQuiz,
     isLoadingQuizDetail,
-
-    // ERROR STATES
-    getQuizzesError,
-    createQuizError,
-    updateQuizError,
-    deleteQuizError,
-    getQuizDetailError,
-
     // ACTIONS
     handleCreateQuiz,
     handleUpdateQuiz,

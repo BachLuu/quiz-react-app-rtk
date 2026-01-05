@@ -15,25 +15,25 @@ import {
   QuizForm,
   QuizList,
   DeleteQuizDialog,
-} from "../../../features/management/quiz/components";
-import useQuizManagement from "../../../features/management/quiz/hooks/useQuizManagement";
-import type { CreateQuizFormData } from "../../../features/management/quiz/schemas/quiz.schema";
+} from "../../../../features/management/quiz/components";
+import useQuizManagement from "../../../../features/management/quiz/hooks/useQuizManagement";
+import type { CreateQuizFormData } from "../../../../features/management/quiz/schemas/quiz.schema";
 import type {
   QuizDetail,
   QuizSummary,
-} from "../../../features/management/quiz/types";
+} from "../../../../features/management/quiz/types";
 import { mapQuizToFormValues } from "@/features/management/quiz/utils/mapper";
 import {
   closeDeleteDialog,
   closeFormDialog,
   openDeleteDialog,
   openFormDialog,
-  selectQuizUiDeleteDialogOpen,
-  selectQuizUiDialogMode,
-  selectQuizUiFormDialogOpen,
-  selectQuizUiPage,
-  selectQuizUiRowsPerPage,
-  selectQuizUiSelectedQuizId,
+  selectQuizManagementUiDeleteDialogOpen,
+  selectQuizManagementUiDialogMode,
+  selectQuizManagementUiFormDialogOpen,
+  selectQuizManagementUiPage,
+  selectQuizManagementUiRowsPerPage,
+  selectQuizManagementUiSelectedQuizId,
   setPage,
   setRowsPerPage,
 } from "@/features/management/quiz/stores/slice";
@@ -46,12 +46,14 @@ import { useAppDispatch, useAppSelector } from "@/shared/stores/hooks";
 export const QuizManagementPage = () => {
   const dispatch = useAppDispatch();
 
-  const page = useAppSelector(selectQuizUiPage);
-  const rowsPerPage = useAppSelector(selectQuizUiRowsPerPage);
-  const isFormDialogOpen = useAppSelector(selectQuizUiFormDialogOpen);
-  const isDeleteDialogOpen = useAppSelector(selectQuizUiDeleteDialogOpen);
-  const dialogMode = useAppSelector(selectQuizUiDialogMode);
-  const selectedQuizId = useAppSelector(selectQuizUiSelectedQuizId);
+  const page = useAppSelector(selectQuizManagementUiPage);
+  const rowsPerPage = useAppSelector(selectQuizManagementUiRowsPerPage);
+  const isFormDialogOpen = useAppSelector(selectQuizManagementUiFormDialogOpen);
+  const isDeleteDialogOpen = useAppSelector(
+    selectQuizManagementUiDeleteDialogOpen
+  );
+  const dialogMode = useAppSelector(selectQuizManagementUiDialogMode);
+  const selectedQuizId = useAppSelector(selectQuizManagementUiSelectedQuizId);
 
   // Quiz hook with CRUD operations
   const {
@@ -73,6 +75,8 @@ export const QuizManagementPage = () => {
   const selectedQuiz: QuizSummary | undefined = quizzes?.content.find(
     (quiz) => quiz.id === selectedQuizId
   );
+
+  /* ---------------------------HANDLERS  ----------------------------------------------- */
 
   // Open create dialog
   const handleOpenCreateDialog = () => {
@@ -127,7 +131,7 @@ export const QuizManagementPage = () => {
     }
   };
 
-  // View quiz details (navigate to detail page)
+  // View quiz details handler
   const handleViewQuiz = async (quiz: QuizSummary) => {
     setSelectedQuizDetail(null);
     dispatch(openFormDialog({ mode: "view", quizId: quiz.id }));

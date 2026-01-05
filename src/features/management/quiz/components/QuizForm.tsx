@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useEffect } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import {
   createQuizSchema,
@@ -58,6 +59,29 @@ export const QuizForm = ({
       isActive: initialData?.isActive ?? true,
     },
   });
+
+  useEffect(() => {
+    if (isCreateMode) return;
+
+    if (isViewMode && detailData) {
+      editForm.reset({
+        title: detailData.title ?? "",
+        description: detailData.description ?? "",
+        duration: detailData.duration ?? 30,
+        thumbnailUrl: detailData.thumbnailUrl ?? "",
+        isActive: detailData.isActive ?? true,
+      });
+      return;
+    }
+
+    editForm.reset({
+      title: initialData?.title ?? "",
+      description: initialData?.description ?? "",
+      duration: initialData?.duration ?? 30,
+      thumbnailUrl: initialData?.thumbnailUrl ?? "",
+      isActive: initialData?.isActive ?? true,
+    });
+  }, [detailData, editForm, initialData, isCreateMode, isViewMode]);
 
   const onCreateSubmit: SubmitHandler<CreateQuizFormData> = async (data) => {
     if (!onSubmit) return;
@@ -239,7 +263,7 @@ export const QuizForm = ({
           helperText={errors.title?.message}
           disabled={isSubmitting}
           placeholder="Enter quiz title (5-255 characters)"
-          InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+          InputProps={{ readOnly: isViewMode }}
         />
 
         {/* Description Field */}
@@ -254,7 +278,7 @@ export const QuizForm = ({
           helperText={errors.description?.message}
           disabled={isSubmitting}
           placeholder="Enter quiz description (max 1000 characters)"
-          InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+          InputProps={{ readOnly: isViewMode }}
         />
 
         {/* Duration Field */}
@@ -269,7 +293,7 @@ export const QuizForm = ({
           disabled={isSubmitting}
           inputProps={{ min: 1, max: 3600 }}
           placeholder="Enter duration in minutes (1-3600)"
-          InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+          InputProps={{ readOnly: isViewMode }}
         />
 
         {/* Thumbnail URL Field */}
@@ -281,7 +305,7 @@ export const QuizForm = ({
           helperText={errors.thumbnailUrl?.message}
           disabled={isSubmitting}
           placeholder="Enter thumbnail URL (optional, max 500 characters)"
-          InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+          InputProps={{ readOnly: isViewMode }}
         />
 
         {/* Is Active Switch */}
