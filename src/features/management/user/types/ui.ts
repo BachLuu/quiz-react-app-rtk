@@ -1,5 +1,4 @@
-import type { User } from "@/shared/types";
-import type { RoleSummary } from "@/shared/types/role/role.ui";
+import type { Role, User } from "@/shared/types";
 
 export type { User as UserSummary };
 
@@ -74,7 +73,7 @@ export type UserDetail = {
   email: string;
   avatar: string;
   dateOfBirth: string;
-  roles: RoleSummary[];
+  roles: Role[];
   isActive: boolean;
   createdAt: string;
   displayName: string;

@@ -2,13 +2,22 @@
  * Question difficulty levels
  * Use union type instead of const enum for better tree-shaking
  */
-export type QuestionType = "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+export type QuestionType =
+  | "MULTIPLE_CHOICE"
+  | "SINGLE_CHOICE"
+  | "TRUE_FALSE"
+  | "FILL_IN_THE_BLANKS"
+  | "SHORT_ANSWER"
+  | "LONG_ANSWER";
 
 /**
  * Helper array for runtime validation (optional)
  */
 export const QUESTION_TYPES: readonly QuestionType[] = [
-  "BEGINNER",
-  "INTERMEDIATE",
-  "ADVANCED",
+  "MULTIPLE_CHOICE",
+  "SINGLE_CHOICE",
+  "TRUE_FALSE",
+  "FILL_IN_THE_BLANKS",
+  "SHORT_ANSWER",
+  "LONG_ANSWER",
 ] as const;

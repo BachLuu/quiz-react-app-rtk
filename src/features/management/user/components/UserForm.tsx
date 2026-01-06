@@ -18,6 +18,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useGetActiveRolesQuery } from "@/shared/api";
+import type { Role } from "@/shared/types";
 import {
   createUserSchema,
   updateUserSchema,
@@ -25,13 +27,6 @@ import {
   type UpdateUserFormData,
 } from "../schemas/user.schema";
 import type { UserFormProps } from "../types";
-
-// Temporary hardcoded roles until role API is implemented
-const AVAILABLE_ROLES = [
-  { id: "1", name: "ROLE_ADMIN", label: "Admin" },
-  { id: "2", name: "ROLE_USER", label: "User" },
-  { id: "3", name: "ROLE_MODERATOR", label: "Moderator" },
-];
 
 /**
  * UserForm Component
@@ -51,6 +46,12 @@ export const UserForm = ({
   const isEditMode = mode === "edit";
   const isCreateMode = mode === "create";
 
+  const { data: activeRoles, isLoading: isLoadingRoles } =
+    useGetActiveRolesQuery();
+
+  // ✅ Determine data source for edit/view form (view prioritizes detailData, edit uses initialData)
+  const editSource = isViewMode ? detailData : initialData;
+
   // Separate useForm hooks for create and edit/view modes (enterprise pattern)
   const createForm = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
@@ -66,21 +67,28 @@ export const UserForm = ({
     },
   });
 
+  // ✅ Use "values" prop to auto-sync form with async data (RHF v7.43+)
   const editForm = useForm<UpdateUserFormData>({
     resolver: zodResolver(updateUserSchema),
-    defaultValues: {
-      firstName: initialData?.firstName ?? "",
-      lastName: initialData?.lastName ?? "",
-      password: "",
-      avatar: initialData?.avatar ?? "",
-      dateOfBirth: initialData?.dateOfBirth ?? "",
+    values: {
+      firstName: editSource?.firstName ?? "",
+      lastName: editSource?.lastName ?? "",
+      avatar: editSource?.avatar ?? "",
+      dateOfBirth: editSource?.dateOfBirth ?? "",
       roleIds:
-        initialData?.roles?.map((role: any) =>
-          typeof role === "string" ? role : role.name
+        editSource?.roles?.map((role: string | Role) =>
+          typeof role === "string" ? role : role.id
         ) ?? [],
-      isActive: initialData?.isActive ?? true,
+      isActive: editSource?.isActive ?? true,
     },
   });
+
+  const getRoleLabelByIdOrName = (roleIdOrName: string): string => {
+    const role = activeRoles?.find(
+      (r) => r.id === roleIdOrName || r.name === roleIdOrName
+    );
+    return role?.name ?? roleIdOrName;
+  };
 
   const onCreateSubmit: SubmitHandler<CreateUserFormData> = async (data) => {
     if (!onSubmit) return;
@@ -189,18 +197,15 @@ export const UserForm = ({
                   {...field}
                   labelId="user-roles-label"
                   multiple
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isLoadingRoles}
                   input={<OutlinedInput label="Roles *" />}
                   renderValue={(selected) => (
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                       {(selected as string[]).map((roleId) => {
-                        const role = AVAILABLE_ROLES.find(
-                          (r) => r.id === roleId
-                        );
                         return (
                           <Chip
                             key={roleId}
-                            label={role?.label ?? roleId}
+                            label={getRoleLabelByIdOrName(roleId)}
                             size="small"
                           />
                         );
@@ -208,9 +213,9 @@ export const UserForm = ({
                     </Box>
                   )}
                 >
-                  {AVAILABLE_ROLES.map((role) => (
+                  {(activeRoles ?? []).map((role) => (
                     <MenuItem key={role.id} value={role.id}>
-                      {role.label}
+                      {role.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -319,66 +324,37 @@ export const UserForm = ({
             {...register("firstName")}
             label="First Name"
             fullWidth
-            required
+            required={!isViewMode}
             error={!!errors.firstName}
             helperText={errors.firstName?.message}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewMode}
             placeholder="Enter first name"
-            InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+            InputProps={{ readOnly: isViewMode }}
+            InputLabelProps={{ shrink: true }}
           />
 
           <TextField
             {...register("lastName")}
             label="Last Name"
             fullWidth
-            required
+            required={!isViewMode}
             error={!!errors.lastName}
             helperText={errors.lastName?.message}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewMode}
             placeholder="Enter last name"
-            InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+            InputProps={{ readOnly: isViewMode }}
+            InputLabelProps={{ shrink: true }}
           />
         </Stack>
 
         {/* Email Display - Read-only in Edit/View mode */}
-        {initialData?.email && (
+        {editSource?.email && (
           <TextField
             label="Email"
-            value={initialData.email}
+            value={editSource.email}
             fullWidth
             InputProps={{ readOnly: true }}
             helperText={isEditMode ? "Email cannot be changed" : undefined}
-          />
-        )}
-
-        {/* Password Field - Only in create mode */}
-        {isCreateMode && (
-          <TextField
-            {...register("password")}
-            label="Password"
-            type="password"
-            fullWidth
-            required
-            error={!!errors.password}
-            helperText={errors.password?.message}
-            disabled={isSubmitting}
-            placeholder="Enter password (min 6 characters)"
-          />
-        )}
-
-        {/* Password Field - Optional in edit mode */}
-        {isEditMode && (
-          <TextField
-            {...register("password")}
-            label="Password"
-            type="password"
-            fullWidth
-            error={!!errors.password}
-            helperText={
-              errors.password?.message || "Leave blank to keep current password"
-            }
-            disabled={isSubmitting}
-            placeholder="Enter new password (optional)"
           />
         )}
 
@@ -389,9 +365,10 @@ export const UserForm = ({
           fullWidth
           error={!!errors.avatar}
           helperText={errors.avatar?.message}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isViewMode}
           placeholder="Enter avatar URL (optional)"
-          InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+          InputProps={{ readOnly: isViewMode }}
+          InputLabelProps={{ shrink: true }}
         />
 
         {/* Date of Birth Field */}
@@ -402,10 +379,10 @@ export const UserForm = ({
           fullWidth
           error={!!errors.dateOfBirth}
           helperText={errors.dateOfBirth?.message}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isViewMode}
           placeholder="YYYY-MM-DD"
           InputLabelProps={{ shrink: true }}
-          InputProps={{ readOnly: isViewMode, disabled: isViewMode }}
+          InputProps={{ readOnly: isViewMode }}
         />
 
         {/* Roles Multi-Select */}
@@ -419,16 +396,15 @@ export const UserForm = ({
                 {...field}
                 labelId="user-roles-label"
                 multiple
-                disabled={isSubmitting || isViewMode}
+                disabled={isSubmitting || isViewMode || isLoadingRoles}
                 input={<OutlinedInput label="Roles *" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {(selected as string[]).map((roleId) => {
-                      const role = AVAILABLE_ROLES.find((r) => r.id === roleId);
                       return (
                         <Chip
                           key={roleId}
-                          label={role?.label ?? roleId}
+                          label={getRoleLabelByIdOrName(roleId)}
                           size="small"
                         />
                       );
@@ -436,9 +412,9 @@ export const UserForm = ({
                   </Box>
                 )}
               >
-                {AVAILABLE_ROLES.map((role) => (
+                {(activeRoles ?? []).map((role) => (
                   <MenuItem key={role.id} value={role.id}>
-                    {role.label}
+                    {role.name}
                   </MenuItem>
                 ))}
               </Select>

@@ -10,7 +10,9 @@ import { ForbiddenPage, NotFoundPage } from ".";
 import App from "../App"; // Import App component
 import HomePage from "./protected/HomePage";
 import ProfilePage from "./protected/ProfilePage";
+import { QuestionManagementPage } from "./protected/management/QuestionManagementPage";
 import QuizManagementPage from "./protected/management/QuizManagementPage";
+import { RoleManagementPage } from "./protected/management/RoleManagementPage";
 import UserManagementPage from "./protected/management/UserManagementPage";
 import { LoginPage } from "./public/LoginPage";
 import { RegisterPage } from "./public/RegisterPage";
@@ -63,8 +65,16 @@ export const router = createBrowserRouter([
                 path: "/management",
                 children: [
                   {
+                    path: "/management/questions",
+                    element: <QuestionManagementPage />,
+                  },
+                  {
                     path: "/management/quizzes",
                     element: <QuizManagementPage />,
+                  },
+                  {
+                    path: "/management/roles",
+                    element: <RoleManagementPage />,
                   },
                   {
                     path: "/management/users",

@@ -41,7 +41,7 @@ export const createUserSchema = z.strictObject({
   isActive: z.boolean(),
 });
 
-// Update schema - password and isActive are optional
+// Update schema - password is not supported; other fields are optional
 export const updateUserSchema = z.strictObject({
   firstName: z
     .string()
@@ -53,12 +53,6 @@ export const updateUserSchema = z.strictObject({
     .min(1, "Last name is required")
     .max(50, "Last name must not exceed 50 characters")
     .optional(),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .max(100, "Password must not exceed 100 characters")
-    .optional()
-    .or(z.literal("")),
   avatar: z
     .string()
     .max(500, "Avatar URL must not exceed 500 characters")

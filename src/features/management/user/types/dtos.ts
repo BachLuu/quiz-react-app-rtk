@@ -13,7 +13,6 @@ export type CreateUserRequest = {
 export type UpdateUserRequest = {
   firstName?: string;
   lastName?: string;
-  password?: string;
   avatar?: string;
   dateOfBirth?: string;
   roleIds?: string[];
