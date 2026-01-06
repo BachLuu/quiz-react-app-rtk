@@ -7,4 +7,4 @@ export interface Quiz {
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
+};
