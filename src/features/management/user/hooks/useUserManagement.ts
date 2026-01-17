@@ -1,10 +1,9 @@
 import { useToast } from "@/app/providers/ToastProvider";
-import { useGetPagedUsersQuery } from "@/shared/api";
+import { useGetPagedUsersQuery, useLazyGetUserByIdQuery } from "@/shared/api";
 import type { PageParamsRequest } from "@/shared/types";
 import {
   useCreateUserMutation,
   useDeleteUserMutation,
-  useLazyGetUserByIdQuery,
   useUpdateUserMutation,
 } from "../api";
 import type {

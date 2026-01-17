@@ -1,3 +1,5 @@
+import type { Role } from "@/shared/types/role";
+
 /**
  * DTO cho Login request
  * Best practice: Validation sẽ được xử lý ở component level với react-hook-form hoặc formik
@@ -65,7 +67,8 @@ export interface AuthUser {
   lastName: string;
   email: string;
   avatar?: string | null;
-  roles: string[]; // Simplified roles - chỉ lấy role names
+  dateOfBirth?: string | null;
+  roles: string[] | Role[]; // Can be role names (string[]) or full Role objects
   isActive: boolean;
 }
 /**

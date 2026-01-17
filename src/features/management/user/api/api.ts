@@ -8,17 +8,6 @@ import type {
 const userManagementApi = api.injectEndpoints({
   endpoints: (builder) => ({
     /**
-     * Get single user by ID
-     */
-    getUserById: builder.query<UserDetailResponse, string>({
-      query: (id) => ({
-        url: `/users/${id}`,
-        method: "GET",
-      }),
-      providesTags: (_result, _error, id) => [{ type: "User", id }],
-    }),
-
-    /**
      * Create new user
      * Invalidates "User" list cache after successful creation
      */
@@ -65,8 +54,6 @@ const userManagementApi = api.injectEndpoints({
 });
 
 export const {
-  useGetUserByIdQuery,
-  useLazyGetUserByIdQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,

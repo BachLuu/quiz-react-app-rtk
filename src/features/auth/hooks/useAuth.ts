@@ -1,9 +1,9 @@
 /**
  * useAuth Hook - Enterprise Edition
  *
- * Single Source of Truth: RTK Query cache
- * - Không dùng Redux authSlice nữa
+ * Single Source of Truth: RTK Query cache + Redux store for userId
  * - State được lấy trực tiếp từ RTK Query
+ * - userId được lưu vào Redux store để dùng toàn app (profile, etc.)
  * - Error handling: chỉ hiển thị lỗi từ user actions, bỏ qua 401 từ /auth/me
  */
 
@@ -13,15 +13,11 @@ import {
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,
-  useUpdateProfileMutation,
 } from "@/features/auth/api";
-import type {
-  LoginRequest,
-  RegisterRequest,
-  UpdateProfileRequest,
-} from "@/features/auth/types";
+import { clearUserId, setUserId } from "@/features/auth/stores/slice";
+import type { LoginRequest, RegisterRequest } from "@/features/auth/types";
 import { useAppDispatch } from "@/shared/stores/hooks";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -40,8 +36,6 @@ export const useAuth = () => {
     { isLoading: isRegisterLoading, error: registerError },
   ] = useRegisterMutation();
   const [logoutMutation] = useLogoutMutation();
-  const [updateProfileMutation, { isLoading: isUpdatingProfile }] =
-    useUpdateProfileMutation();
 
   // --- RTK Query - Current User (Single Source of Truth) ---
   const {
@@ -49,6 +43,15 @@ export const useAuth = () => {
     isLoading: isLoadingUser,
     refetch: refetchUser,
   } = useGetCurrentUserQuery();
+
+  // --- Sync userId to Redux store when user changes ---
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(setUserId({ userId: user.id }));
+    } else {
+      dispatch(clearUserId());
+    }
+  }, [user?.id, dispatch]);
 
   // --- Derived States ---
 
@@ -118,29 +121,14 @@ export const useAuth = () => {
   }, [dispatch, logoutMutation, navigate]);
 
   /**
-   * Update profile
-   */
-  const updateProfile = useCallback(
-    async (profileData: UpdateProfileRequest) => {
-      try {
-        // Call API với RTK Query
-        const updatedUser = await updateProfileMutation(profileData).unwrap();
-
-        // RTK Query tự động update cache "User"
-        return updatedUser;
-      } catch (err) {
-        throw err;
-      }
-    },
-    [updateProfileMutation]
-  );
-
-  /**
    * Check if user has specific role
    */
   const hasRole = useCallback(
-    (role: string): boolean => {
-      return user?.roles?.includes(role) ?? false;
+    (roleName: string): boolean => {
+      if (!user?.roles) return false;
+      return user.roles.some((role) =>
+        typeof role === "string" ? role === roleName : role.name === roleName
+      );
     },
     [user]
   );
@@ -160,7 +148,6 @@ export const useAuth = () => {
     user,
     isAuthenticated,
     isLoading,
-    isUpdatingProfile,
     error,
 
     // Actions
@@ -168,7 +155,6 @@ export const useAuth = () => {
     register,
     logout,
     refetchUser,
-    updateProfile,
 
     // Utilities
     hasRole,

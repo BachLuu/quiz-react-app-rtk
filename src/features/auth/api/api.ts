@@ -5,14 +5,13 @@
 
 import { api } from "@/shared/api/common/api";
 import type {
-  LoginRequest,
   AuthResponse,
-  RegisterRequest,
   AuthUser,
   ChangePasswordRequest,
   ForgotPasswordRequest,
+  LoginRequest,
+  RegisterRequest,
   ResetPasswordRequest,
-  UpdateProfileRequest,
 } from "../types";
 
 /**
@@ -113,40 +112,6 @@ export const authApi = api.injectEndpoints({
         body: resetData,
       }),
     }),
-
-    /**
-     * Update profile mutation
-     */
-    updateProfile: builder.mutation<AuthUser, UpdateProfileRequest>({
-      query: (profileData) => {
-        const isFileUpload = profileData.avatar instanceof File;
-
-        if (isFileUpload) {
-          const formData = new FormData();
-          Object.entries(profileData).forEach(([key, value]) => {
-            if (value !== undefined) {
-              formData.append(key, value as string | Blob);
-            }
-          });
-
-          return {
-            url: "/auth/profile",
-            method: "PUT",
-            body: formData,
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          };
-        }
-
-        return {
-          url: "/auth/profile",
-          method: "PUT",
-          body: profileData,
-        };
-      },
-      invalidatesTags: ["User"],
-    }),
   }),
 });
 
@@ -162,5 +127,4 @@ export const {
   useChangePasswordMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-  useUpdateProfileMutation,
 } = authApi;

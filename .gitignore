@@ -25,3 +25,5 @@ dist-ssr
 quiz-react-app.code-workspace
 .github/copilot-instructions.md
 requirement.txt
+.github/skills/react-rtk/agent-skills.md
+requirement.md

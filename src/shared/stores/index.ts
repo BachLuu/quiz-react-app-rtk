@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { api } from "@/shared/api/common/api";
+import authUiReducer from "@/features/auth/stores/slice";
 import quizUiReducer from "@/features/management/quiz/stores/slice";
 import questionUiReducer from "@/features/management/question/stores/slice";
 import roleUiReducer from "@/features/management/role/stores/slice";
@@ -8,6 +9,7 @@ import managementUserUiReducer from "@/features/management/user/stores/slice";
 export const store = configureStore({
   reducer: {
     [api.reducerPath]: api.reducer,
+    authUi: authUiReducer,
     quizManagementUi: quizUiReducer,
     questionManagementUi: questionUiReducer,
     roleManagementUi: roleUiReducer,
