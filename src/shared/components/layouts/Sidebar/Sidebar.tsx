@@ -8,6 +8,7 @@ import {
   HelpOutline as QuestionIcon,
   People as UserIcon,
   VpnKey as RoleIcon,
+  BarChart as AnalyticsIcon,
 } from "@mui/icons-material";
 import {
   Box,
@@ -28,6 +29,7 @@ const drawerWidth = 240;
 
 const menuItems = [
   { text: "Home", icon: <HomeIcon />, path: "/home" },
+  { text: "Analytics", icon: <AnalyticsIcon />, path: "/analytics" },
   {
     text: "Management",
     icon: <ManagementIcon />,
@@ -48,7 +50,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openManagement, setOpenManagement] = useState(() =>
-    location.pathname.startsWith("/management")
+    location.pathname.startsWith("/management"),
   );
 
   const handleManagementClick = () => {

@@ -8,6 +8,7 @@ import { MainLayout } from "@/shared/components/layouts/MainLayout";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { ForbiddenPage, NotFoundPage } from ".";
 import App from "../App"; // Import App component
+import AnalyticsDashboardPage from "./protected/AnalyticsDashboardPage";
 import HomePage from "./protected/HomePage";
 import ProfilePage from "./protected/ProfilePage";
 import { QuestionManagementPage } from "./protected/management/QuestionManagementPage";
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
                 element: <HomePage />,
               },
               {
+                path: "/analytics",
+                element: <AnalyticsDashboardPage />,
+              },
+              {
                 path: "/management",
                 children: [
                   {
@@ -90,9 +95,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
-      // Admin routes...
-
       // Error routes
       {
         path: "/forbidden",

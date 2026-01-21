@@ -11,6 +11,7 @@ export const ROUTES = {
   // --- Protected Routes ---
   HOME: "/home",
   PROFILE: "/profile",
+  ANALYTICS: "/analytics",
 
   // --- Management Feature Routes ---
   MANAGEMENT: {

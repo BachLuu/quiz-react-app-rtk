@@ -13,6 +13,6 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Auth", "User", "Quiz", "Question", "Role"], // Cache tags
+  tagTypes: ["Auth", "User", "Quiz", "Question", "Role", "Analytics"], // Cache tags
   endpoints: () => ({}), // Empty - features will inject endpoints
 });

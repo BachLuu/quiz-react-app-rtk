@@ -9,6 +9,18 @@ import type { Page, User } from "@/shared/types";
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     /**
+     * Get single user by ID
+     * Shared endpoint - used by profile, user management, etc.
+     */
+    getUserById: builder.query<User, string>({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, id) => [{ type: "User", id }],
+    }),
+
+    /**
      * Get paged users
      * Provides tag "User" for automatic cache invalidation
      * Shared endpoint - can be used by any feature
@@ -32,4 +44,9 @@ export const userApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetPagedUsersQuery, useLazyGetPagedUsersQuery } = userApi;
+export const {
+  useGetUserByIdQuery,
+  useLazyGetUserByIdQuery,
+  useGetPagedUsersQuery,
+  useLazyGetPagedUsersQuery,
+} = userApi;
