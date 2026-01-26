@@ -17,6 +17,7 @@ import { RoleManagementPage } from "./protected/management/RoleManagementPage";
 import UserManagementPage from "./protected/management/UserManagementPage";
 import { LoginPage } from "./public/LoginPage";
 import { RegisterPage } from "./public/RegisterPage";
+import { QuizPlayerPage, QuizHistoryPage } from "@/features/quiz-session/pages";
 
 /**
  * Router Configuration
@@ -91,7 +92,17 @@ export const router = createBrowserRouter([
                 path: "/profile",
                 element: <ProfilePage />,
               },
+              // Quiz History (with MainLayout)
+              {
+                path: "/quiz-history",
+                element: <QuizHistoryPage />,
+              },
             ],
+          },
+          // Quiz Player (without MainLayout - full screen experience)
+          {
+            path: "/quiz/:quizId/play",
+            element: <QuizPlayerPage />,
           },
         ],
       },

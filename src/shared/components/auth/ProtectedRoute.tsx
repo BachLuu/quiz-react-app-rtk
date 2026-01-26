@@ -58,7 +58,7 @@ export const ProtectedRoute = ({
 
   // Check role-based access
   if (allowedRoles && allowedRoles.length > 0) {
-    const hasPermission = hasAnyRole(allowedRoles);
+    const hasPermission: boolean = hasAnyRole(allowedRoles);
 
     if (!hasPermission) {
       return forbiddenFallback || <Navigate to="/forbidden" replace />;

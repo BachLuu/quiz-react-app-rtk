@@ -1,34 +1,22 @@
-import { useMemo } from "react";
-import {
-  IconButton,
-  Chip,
-  Typography,
-  Skeleton,
-  Tooltip,
-  Stack,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { DataTable, type DataTableColumn } from "@/shared/components/table";
-import type { Page } from "@/shared/types/page";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import {
+  Chip,
+  IconButton,
+  Skeleton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { useMemo } from "react";
 import type {
+  UserListProps,
   UserSummary,
   UserTableColumnId,
   UserTableSortableColumnId,
 } from "../types/ui";
-
-export interface UserListProps {
-  users?: Page<UserSummary>;
-  isLoading?: boolean;
-  page: number;
-  rowsPerPage: number;
-  onPageChange: (page: number) => void;
-  onRowsPerPageChange: (rowsPerPage: number) => void;
-  onEdit?: (user: UserSummary) => void;
-  onDelete?: (user: UserSummary) => void;
-  onView?: (user: UserSummary) => void;
-}
 
 /**
  * UserList Component
@@ -172,7 +160,7 @@ export const UserList = ({
         ),
       },
     ],
-    [onDelete, onEdit, onView]
+    [onDelete, onEdit, onView],
   );
 
   const rows = users?.content ?? [];

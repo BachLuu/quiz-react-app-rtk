@@ -49,7 +49,7 @@ export const UserManagementPage = () => {
   const rowsPerPage = useAppSelector(selectUserManagementUiRowsPerPage);
   const isFormDialogOpen = useAppSelector(selectUserManagementUiFormDialogOpen);
   const isDeleteDialogOpen = useAppSelector(
-    selectUserManagementUiDeleteDialogOpen
+    selectUserManagementUiDeleteDialogOpen,
   );
   const dialogMode = useAppSelector(selectUserManagementUiDialogMode);
   const selectedUserId = useAppSelector(selectUserManagementUiSelectedUserId);
@@ -75,7 +75,7 @@ export const UserManagementPage = () => {
     useState<UserDetail | null>(null);
 
   const selectedUser: UserSummary | undefined = pagedUsers?.content.find(
-    (user) => user.id === selectedUserId
+    (user) => user.id === selectedUserId,
   );
 
   /* ---------------------------HANDLERS----------------------------------------------- */
@@ -151,8 +151,8 @@ export const UserManagementPage = () => {
     dialogMode === "edit"
       ? "Edit User"
       : dialogMode === "view"
-      ? "User Detail"
-      : "Create New User";
+        ? "User Detail"
+        : "Create New User";
 
   return (
     <Box sx={{ p: 3 }}>
@@ -223,18 +223,19 @@ export const UserManagementPage = () => {
               initialData={mapUserToFormValues(
                 dialogMode === "edit"
                   ? selectedUser
-                  : selectedUserDetail ?? undefined
+                  : (selectedUserDetail ?? undefined),
               )}
               detailData={
                 dialogMode === "view"
-                  ? selectedUserDetail ?? undefined
+                  ? (selectedUserDetail ?? undefined)
                   : undefined
               }
               onSubmit={dialogMode === "view" ? undefined : handleFormSubmit}
-              isSubmitting={
-                isCreatingUser ||
-                isUpdatingUser ||
-                (dialogMode === "view" && isLoadingUserDetail)
+              isSubmitting={isCreatingUser || isUpdatingUser}
+              isLoadingData={
+                dialogMode !== "create" &&
+                isLoadingUserDetail &&
+                !selectedUserDetail
               }
               submitButtonText={dialogMode === "edit" ? "Update" : "Create"}
               onCancel={handleCloseFormDialog}

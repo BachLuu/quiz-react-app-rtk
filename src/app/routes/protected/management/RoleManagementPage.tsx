@@ -48,7 +48,7 @@ export const RoleManagementPage = () => {
   const rowsPerPage = useAppSelector(selectRoleManagementUiRowsPerPage);
   const isFormDialogOpen = useAppSelector(selectRoleManagementUiFormDialogOpen);
   const isDeleteDialogOpen = useAppSelector(
-    selectRoleManagementUiDeleteDialogOpen
+    selectRoleManagementUiDeleteDialogOpen,
   );
   const dialogMode = useAppSelector(selectRoleManagementUiDialogMode);
   const selectedRoleId = useAppSelector(selectRoleManagementUiSelectedRoleId);
@@ -73,7 +73,7 @@ export const RoleManagementPage = () => {
 
   // Edit/Delete uses summary data from RTK Query cache
   const selectedRole: RoleSummary | undefined = roles?.content.find(
-    (r) => r.id === selectedRoleId
+    (r) => r.id === selectedRoleId,
   );
 
   /* --------------------------- HANDLERS ----------------------------------------------- */
@@ -149,8 +149,8 @@ export const RoleManagementPage = () => {
     dialogMode === "edit"
       ? "Edit Role"
       : dialogMode === "view"
-      ? "Role Detail"
-      : "Create New Role";
+        ? "Role Detail"
+        : "Create New Role";
 
   return (
     <Box sx={{ p: 3 }}>
@@ -219,18 +219,19 @@ export const RoleManagementPage = () => {
             <RoleForm
               mode={dialogMode}
               initialData={mapRoleToFormValues(
-                dialogMode === "edit" ? selectedRole : selectedRoleDetail
+                dialogMode === "edit" ? selectedRole : selectedRoleDetail,
               )}
               detailData={
                 dialogMode === "view"
-                  ? selectedRoleDetail ?? undefined
+                  ? (selectedRoleDetail ?? undefined)
                   : undefined
               }
               onSubmit={dialogMode === "view" ? undefined : handleFormSubmit}
-              isSubmitting={
-                isCreatingRole ||
-                isUpdatingRole ||
-                (dialogMode === "view" && isLoadingRoleDetail)
+              isSubmitting={isCreatingRole || isUpdatingRole}
+              isLoadingData={
+                dialogMode !== "create" &&
+                isLoadingRoleDetail &&
+                !selectedRoleDetail
               }
               submitButtonText={dialogMode === "edit" ? "Update" : "Create"}
               onCancel={handleCloseFormDialog}

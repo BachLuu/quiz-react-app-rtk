@@ -34,6 +34,8 @@ export type QuizFormProps = {
   detailData?: QuizDetail;
   onSubmit?: (data: CreateQuizFormData) => Promise<void>;
   isSubmitting?: boolean;
+  /** Whether data is being loaded (shows skeleton) */
+  isLoadingData?: boolean;
   submitButtonText?: string;
   onCancel?: () => void;
 };

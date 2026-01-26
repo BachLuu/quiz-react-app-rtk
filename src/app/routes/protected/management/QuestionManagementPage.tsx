@@ -17,7 +17,10 @@ import {
   DeleteQuestionDialog,
 } from "@/features/management/question/components";
 import { useQuestionManagement } from "@/features/management/question/hooks/useQuestionManagement";
-import type { CreateQuestionFormData } from "@/features/management/question/schemas/question.schema";
+import type {
+  CreateQuestionFormData,
+  UpdateQuestionFormData,
+} from "@/features/management/question/schemas/question.schema";
 import type {
   QuestionDetail,
   QuestionSummary,
@@ -50,14 +53,14 @@ export const QuestionManagementPage = () => {
   const page = useAppSelector(selectQuestionManagementUiPage);
   const rowsPerPage = useAppSelector(selectQuestionManagementUiRowsPerPage);
   const isFormDialogOpen = useAppSelector(
-    selectQuestionManagementUiFormDialogOpen
+    selectQuestionManagementUiFormDialogOpen,
   );
   const isDeleteDialogOpen = useAppSelector(
-    selectQuestionManagementUiDeleteDialogOpen
+    selectQuestionManagementUiDeleteDialogOpen,
   );
   const dialogMode = useAppSelector(selectQuestionManagementUiDialogMode);
   const selectedQuestionId = useAppSelector(
-    selectQuestionManagementUiSelectedQuestionId
+    selectQuestionManagementUiSelectedQuestionId,
   );
 
   // Question hook with CRUD operations
@@ -80,7 +83,7 @@ export const QuestionManagementPage = () => {
 
   // Edit/Delete uses summary data from RTK Query cache
   const selectedQuestion: QuestionSummary | undefined = questions?.content.find(
-    (q) => q.id === selectedQuestionId
+    (q) => q.id === selectedQuestionId,
   );
 
   /* --------------------------- HANDLERS ----------------------------------------------- */
@@ -91,10 +94,19 @@ export const QuestionManagementPage = () => {
     dispatch(openFormDialog({ mode: "create", questionId: null }));
   };
 
-  // Open edit dialog
-  const handleOpenEditDialog = (question: QuestionSummary) => {
+  // Open edit dialog - fetch detail first to get options
+  const handleOpenEditDialog = async (question: QuestionSummary) => {
     setSelectedQuestionDetail(null);
     dispatch(openFormDialog({ mode: "edit", questionId: question.id }));
+
+    // Fetch detail to get question options
+    const detail = await handleViewQuestionDetail(question.id);
+    if (!detail) {
+      handleCloseFormDialog();
+      return;
+    }
+
+    setSelectedQuestionDetail(detail);
   };
 
   // Close form dialog
@@ -114,13 +126,18 @@ export const QuestionManagementPage = () => {
   };
 
   // Handle form submit (create or update)
-  const handleFormSubmit = async (data: CreateQuestionFormData) => {
+  const handleFormSubmit = async (
+    data: CreateQuestionFormData | UpdateQuestionFormData,
+  ) => {
     let success = false;
 
     if (dialogMode === "edit" && selectedQuestion) {
-      success = await handleUpdateQuestion(selectedQuestion.id, data);
+      success = await handleUpdateQuestion(
+        selectedQuestion.id,
+        data as UpdateQuestionFormData,
+      );
     } else {
-      success = await handleCreateQuestion(data);
+      success = await handleCreateQuestion(data as CreateQuestionFormData);
     }
 
     if (success) {
@@ -156,8 +173,8 @@ export const QuestionManagementPage = () => {
     dialogMode === "edit"
       ? "Edit Question"
       : dialogMode === "view"
-      ? "Question Detail"
-      : "Create New Question";
+        ? "Question Detail"
+        : "Create New Question";
 
   return (
     <Box sx={{ p: 3 }}>
@@ -230,20 +247,19 @@ export const QuestionManagementPage = () => {
             <QuestionForm
               mode={dialogMode}
               initialData={mapQuestionToFormValues(
-                dialogMode === "edit"
-                  ? selectedQuestion
-                  : selectedQuestionDetail
+                dialogMode === "create" ? undefined : selectedQuestionDetail,
               )}
               detailData={
-                dialogMode === "view"
-                  ? selectedQuestionDetail ?? undefined
-                  : undefined
+                dialogMode === "create"
+                  ? undefined
+                  : (selectedQuestionDetail ?? undefined)
               }
               onSubmit={dialogMode === "view" ? undefined : handleFormSubmit}
-              isSubmitting={
-                isCreatingQuestion ||
-                isUpdatingQuestion ||
-                (dialogMode === "view" && isLoadingQuestionDetail)
+              isSubmitting={isCreatingQuestion || isUpdatingQuestion}
+              isLoadingData={
+                dialogMode !== "create" &&
+                isLoadingQuestionDetail &&
+                !selectedQuestionDetail
               }
               submitButtonText={dialogMode === "edit" ? "Update" : "Create"}
               onCancel={handleCloseFormDialog}

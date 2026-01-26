@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box, Chip, IconButton, Tooltip } from "@mui/material";
+import { Box, Chip, IconButton, Skeleton, Stack, Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -39,6 +39,7 @@ export const RoleList = ({
         id: "index",
         label: "#",
         sortable: false,
+        renderSkeleton: () => <Skeleton variant="text" width={24} />,
         render: (_row, rowIndex) => {
           // Calculate global index based on current page and row position
           const globalIndex = page * rowsPerPage + (rowIndex ?? 0) + 1;
@@ -50,6 +51,7 @@ export const RoleList = ({
         label: "Name",
         sortable: true,
         getSortValue: (role) => role.name,
+        renderSkeleton: () => <Skeleton variant="text" width="80%" />,
         render: (role) => (
           <Box
             sx={{
@@ -64,6 +66,9 @@ export const RoleList = ({
         id: "status",
         label: "Status",
         sortable: false,
+        renderSkeleton: () => (
+          <Skeleton variant="rounded" width={70} height={24} />
+        ),
         render: (role) => (
           <Chip
             label={role.isActive ? "Active" : "Inactive"}
@@ -76,6 +81,13 @@ export const RoleList = ({
         id: "actions",
         label: "Actions",
         sortable: false,
+        renderSkeleton: () => (
+          <Stack direction="row" spacing={1} justifyContent="center">
+            <Skeleton variant="circular" width={32} height={32} />
+            <Skeleton variant="circular" width={32} height={32} />
+            <Skeleton variant="circular" width={32} height={32} />
+          </Stack>
+        ),
         render: (role) => (
           <Box sx={{ display: "flex", gap: 0.5 }}>
             {onView && (
@@ -115,7 +127,7 @@ export const RoleList = ({
         ),
       },
     ],
-    [onView, onEdit, onDelete, page, rowsPerPage]
+    [onView, onEdit, onDelete, page, rowsPerPage],
   );
 
   return (

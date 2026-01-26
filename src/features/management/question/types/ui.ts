@@ -1,4 +1,5 @@
 import type { Question, QuestionType } from "@/shared/types";
+import type { QuestionOptionDetailResponse } from "./dtos";
 
 export type { Question as QuestionSummary };
 
@@ -7,28 +8,33 @@ export type QuestionDialogMode = "create" | "edit" | "view";
 export type QuestionFormMode = "create" | "edit" | "view";
 
 export type QuestionFormInitialData = Partial<
-  Pick<QuestionDetail, "id" | "content" | "questionType" | "isActive">
+  Pick<
+    QuestionDetail,
+    "id" | "content" | "questionType" | "isActive" | "options"
+  >
 >;
 
-export interface QuestionFormProps {
+export type QuestionFormProps = {
   mode?: QuestionFormMode;
   initialData?: QuestionFormInitialData;
   detailData?: QuestionDetail;
   onSubmit?: (data: any) => Promise<void>;
   isSubmitting?: boolean;
+  /** Whether data is being loaded (shows skeleton) */
+  isLoadingData?: boolean;
   submitButtonText?: string;
   onCancel?: () => void;
-}
+};
 
-export interface DeleteQuestionDialogProps {
+export type DeleteQuestionDialogProps = {
   open: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   question?: Question | null;
   isDeleting?: boolean;
-}
+};
 
-export interface QuestionListProps {
+export type QuestionListProps = {
   questions?: {
     content: Question[];
     totalPages: number;
@@ -42,7 +48,7 @@ export interface QuestionListProps {
   onEdit?: (question: Question) => void;
   onDelete?: (question: Question) => void;
   onView?: (question: Question) => void;
-}
+};
 
 export type QuestionTableColumnId =
   | "index"
@@ -66,9 +72,10 @@ export type QuestionManagementPageState = {
 };
 
 /* UI Models */
-export interface QuestionDetail {
+export type QuestionDetail = {
   id: string;
   content: string;
   questionType: QuestionType;
   isActive: boolean;
-}
+  options: QuestionOptionDetailResponse[];
+};

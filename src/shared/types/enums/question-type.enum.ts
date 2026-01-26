@@ -7,7 +7,6 @@ export type QuestionType =
   | "SINGLE_CHOICE"
   | "TRUE_FALSE"
   | "FILL_IN_THE_BLANKS"
-  | "SHORT_ANSWER"
   | "LONG_ANSWER";
 
 /**
@@ -18,6 +17,5 @@ export const QUESTION_TYPES: readonly QuestionType[] = [
   "SINGLE_CHOICE",
   "TRUE_FALSE",
   "FILL_IN_THE_BLANKS",
-  "SHORT_ANSWER",
   "LONG_ANSWER",
 ] as const;

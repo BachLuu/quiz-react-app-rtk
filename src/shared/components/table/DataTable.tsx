@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  alpha,
   Box,
   Paper,
   Skeleton,
@@ -12,6 +13,7 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import type {
@@ -31,7 +33,9 @@ export type {
   DataTableSortValue,
 } from "@/shared/types";
 
-const defaultRenderSkeleton = () => <Skeleton variant="text" width="80%" />;
+const defaultRenderSkeleton = () => (
+  <Skeleton variant="text" width="80%" animation="wave" />
+);
 
 const compareSortValues = (a: DataTableSortValue, b: DataTableSortValue) => {
   if (a == null && b == null) return 0;
@@ -55,7 +59,7 @@ const compareSortValues = (a: DataTableSortValue, b: DataTableSortValue) => {
 export const DataTable = <
   T,
   ColumnId extends string,
-  SortableColumnId extends ColumnId
+  SortableColumnId extends ColumnId,
 >({
   rows,
   columns,
@@ -68,6 +72,7 @@ export const DataTable = <
   initialOrderBy,
   initialOrder = "asc",
 }: DataTableProps<T, ColumnId, SortableColumnId>) => {
+  const theme = useTheme();
   const isControlledPagination = Boolean(pagination);
   const [uncontrolledPage, setUncontrolledPage] = useState(0);
   const [uncontrolledRowsPerPage, setUncontrolledRowsPerPage] =
@@ -83,7 +88,7 @@ export const DataTable = <
   const sortableColumns = useMemo(() => {
     return columns.filter(
       (c): c is DataTableSortableColumn<T, SortableColumnId> =>
-        c.sortable === true
+        c.sortable === true,
     );
   }, [columns]);
 
@@ -93,7 +98,7 @@ export const DataTable = <
 
   const [order, setOrder] = useState<DataTableOrder>(initialOrder);
   const [orderBy, setOrderBy] = useState<SortableColumnId | null>(
-    defaultOrderBy
+    defaultOrderBy,
   );
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -105,7 +110,7 @@ export const DataTable = <
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const nextRowsPerPage = parseInt(event.target.value, 10);
     if (pagination) {
@@ -163,7 +168,7 @@ export const DataTable = <
 
     return sortedRows.slice(
       page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage
+      page * rowsPerPage + rowsPerPage,
     );
   }, [isControlledPagination, page, rowsPerPage, sortedRows]);
 
@@ -180,30 +185,73 @@ export const DataTable = <
 
   if (isLoading) {
     return (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell key={column.id} align={column.align ?? "left"}>
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {[...Array(5)].map((_, index) => (
-              <TableRow key={index}>
+      <Paper
+        elevation={0}
+        sx={{
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 2,
+          overflow: "hidden",
+        }}
+      >
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                }}
+              >
                 {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align ?? "left"}>
-                    {(column.renderSkeleton ?? defaultRenderSkeleton)()}
+                  <TableCell
+                    key={column.id}
+                    align={column.align ?? "left"}
+                    sx={{
+                      fontWeight: 600,
+                      color: "text.primary",
+                      borderBottom: `2px solid ${theme.palette.divider}`,
+                      py: 1.5,
+                    }}
+                  >
+                    {column.label}
                   </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {[...Array(5)].map((_, index) => (
+                <TableRow
+                  key={index}
+                  sx={{
+                    "&:nth-of-type(odd)": {
+                      bgcolor: alpha(theme.palette.action.hover, 0.04),
+                    },
+                  }}
+                >
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align={column.align ?? "left"}
+                      sx={{ py: 2 }}
+                    >
+                      {(column.renderSkeleton ?? defaultRenderSkeleton)()}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            bgcolor: alpha(theme.palette.action.hover, 0.02),
+          }}
+        >
+          <Skeleton variant="rectangular" width={300} height={32} />
+        </Box>
+      </Paper>
     );
   }
 
@@ -211,32 +259,80 @@ export const DataTable = <
     if (!emptyState) return null;
 
     return (
-      <Box
+      <Paper
+        elevation={0}
         sx={{
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 2,
           textAlign: "center",
           py: 8,
-          bgcolor: "background.paper",
-          borderRadius: 1,
+          px: 4,
         }}
       >
-        <Typography variant="h6" color="text.secondary" gutterBottom>
-          {emptyState.title}
-        </Typography>
-        {emptyState.description && (
-          <Typography variant="body2" color="text.secondary">
-            {emptyState.description}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
+          {/* Optional icon placeholder */}
+          <Box
+            sx={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 1,
+            }}
+          >
+            <Typography variant="h4" color="primary" sx={{ opacity: 0.6 }}>
+              📭
+            </Typography>
+          </Box>
+          <Typography
+            variant="h6"
+            color="text.primary"
+            fontWeight={600}
+            gutterBottom
+          >
+            {emptyState.title}
           </Typography>
-        )}
-      </Box>
+          {emptyState.description && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ maxWidth: 320 }}
+            >
+              {emptyState.description}
+            </Typography>
+          )}
+        </Box>
+      </Paper>
     );
   }
 
   return (
-    <Paper>
+    <Paper
+      elevation={0}
+      sx={{
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 2,
+        overflow: "hidden",
+      }}
+    >
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow
+              sx={{
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              }}
+            >
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -244,12 +340,30 @@ export const DataTable = <
                   sortDirection={
                     column.sortable && orderBy === column.id ? order : false
                   }
+                  sx={{
+                    fontWeight: 600,
+                    color: "text.primary",
+                    borderBottom: `2px solid ${theme.palette.divider}`,
+                    py: 1.5,
+                    whiteSpace: "nowrap",
+                  }}
                 >
                   {column.sortable ? (
                     <TableSortLabel
                       active={orderBy === column.id}
                       direction={orderBy === column.id ? order : "asc"}
                       onClick={() => handleRequestSort(column.id)}
+                      sx={{
+                        "&.MuiTableSortLabel-root": {
+                          color: "text.primary",
+                        },
+                        "&.MuiTableSortLabel-root:hover": {
+                          color: "primary.main",
+                        },
+                        "&.Mui-active": {
+                          color: "primary.main",
+                        },
+                      }}
                     >
                       {column.label}
                       {orderBy === column.id ? (
@@ -272,10 +386,26 @@ export const DataTable = <
               <TableRow
                 key={resolveRowId(row, index)}
                 hover
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                sx={{
+                  "&:nth-of-type(odd)": {
+                    bgcolor: alpha(theme.palette.action.hover, 0.04),
+                  },
+                  "&:last-child td, &:last-child th": { border: 0 },
+                  "&:hover": {
+                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                  },
+                  transition: "background-color 0.15s ease-in-out",
+                }}
               >
                 {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align ?? "left"}>
+                  <TableCell
+                    key={column.id}
+                    align={column.align ?? "left"}
+                    sx={{
+                      py: 1.75,
+                      borderBottom: `1px solid ${alpha(theme.palette.divider, 0.6)}`,
+                    }}
+                  >
                     {column.render(row, page * rowsPerPage + index)}
                   </TableCell>
                 ))}
@@ -295,6 +425,21 @@ export const DataTable = <
         }
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          borderTop: `1px solid ${theme.palette.divider}`,
+          bgcolor: alpha(theme.palette.action.hover, 0.02),
+          "& .MuiTablePagination-toolbar": {
+            minHeight: 52,
+          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+            {
+              color: "text.secondary",
+              fontSize: "0.875rem",
+            },
+          "& .MuiTablePagination-select": {
+            borderRadius: 1,
+          },
+        }}
       />
     </Paper>
   );

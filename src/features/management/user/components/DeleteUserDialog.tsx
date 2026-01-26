@@ -1,27 +1,13 @@
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
-
-import type { UserSummary } from "../types/ui";
-
-interface DeleteUserDialogProps {
-  /** Whether the dialog is open */
-  open: boolean;
-  /** The user to delete */
-  user: UserSummary | null;
-  /** Whether delete is in progress */
-  isDeleting?: boolean;
-  /** Callback when dialog is closed */
-  onClose: () => void;
-  /** Callback when delete is confirmed */
-  onConfirm: () => void;
-}
+import type { DeleteUserDialogProps } from "../types/ui";
 
 /**
  * DeleteUserDialog Component

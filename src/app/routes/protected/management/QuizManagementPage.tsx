@@ -50,7 +50,7 @@ export const QuizManagementPage = () => {
   const rowsPerPage = useAppSelector(selectQuizManagementUiRowsPerPage);
   const isFormDialogOpen = useAppSelector(selectQuizManagementUiFormDialogOpen);
   const isDeleteDialogOpen = useAppSelector(
-    selectQuizManagementUiDeleteDialogOpen
+    selectQuizManagementUiDeleteDialogOpen,
   );
   const dialogMode = useAppSelector(selectQuizManagementUiDialogMode);
   const selectedQuizId = useAppSelector(selectQuizManagementUiSelectedQuizId);
@@ -73,7 +73,7 @@ export const QuizManagementPage = () => {
     useState<QuizDetail | null>(null);
 
   const selectedQuiz: QuizSummary | undefined = quizzes?.content.find(
-    (quiz) => quiz.id === selectedQuizId
+    (quiz) => quiz.id === selectedQuizId,
   );
 
   /* ---------------------------HANDLERS  ----------------------------------------------- */
@@ -149,8 +149,8 @@ export const QuizManagementPage = () => {
     dialogMode === "edit"
       ? "Edit Quiz"
       : dialogMode === "view"
-      ? "Quiz Detail"
-      : "Create New Quiz";
+        ? "Quiz Detail"
+        : "Create New Quiz";
 
   return (
     <Box sx={{ p: 3 }}>
@@ -219,18 +219,19 @@ export const QuizManagementPage = () => {
             <QuizForm
               mode={dialogMode}
               initialData={mapQuizToFormValues(
-                dialogMode === "edit" ? selectedQuiz : selectedQuizDetail
+                dialogMode === "edit" ? selectedQuiz : selectedQuizDetail,
               )}
               detailData={
                 dialogMode === "view"
-                  ? selectedQuizDetail ?? undefined
+                  ? (selectedQuizDetail ?? undefined)
                   : undefined
               }
               onSubmit={dialogMode === "view" ? undefined : handleFormSubmit}
-              isSubmitting={
-                isCreatingQuiz ||
-                isUpdatingQuiz ||
-                (dialogMode === "view" && isLoadingQuizDetail)
+              isSubmitting={isCreatingQuiz || isUpdatingQuiz}
+              isLoadingData={
+                dialogMode !== "create" &&
+                isLoadingQuizDetail &&
+                !selectedQuizDetail
               }
               submitButtonText={dialogMode === "edit" ? "Update" : "Create"}
               onCancel={handleCloseFormDialog}

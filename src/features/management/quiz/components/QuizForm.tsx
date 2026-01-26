@@ -5,10 +5,10 @@ import {
   CircularProgress,
   Divider,
   FormControlLabel,
+  Skeleton,
   Stack,
   Switch,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useEffect } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
@@ -19,6 +19,68 @@ import {
   type UpdateQuizFormData,
 } from "../schemas/quiz.schema";
 import type { QuizFormProps } from "../types";
+
+/** Skeleton component for QuizForm loading state */
+const QuizFormSkeleton = ({ isViewMode = false }: { isViewMode?: boolean }) => (
+  <Stack spacing={3}>
+    {/* View mode extra fields skeleton */}
+    {isViewMode && (
+      <>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          {[1, 2, 3].map((i) => (
+            <Box key={i} flex={1}>
+              <Skeleton
+                variant="text"
+                width={80}
+                height={20}
+                sx={{ mb: 0.5 }}
+              />
+              <Skeleton
+                variant="rounded"
+                width="100%"
+                height={56}
+                animation="wave"
+              />
+            </Box>
+          ))}
+        </Stack>
+        <Divider />
+      </>
+    )}
+    {/* Title Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={50} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Description Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={100} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={120} animation="wave" />
+    </Box>
+    {/* Duration Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={120} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Thumbnail URL Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={100} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Switch skeleton */}
+    <Stack direction="row" alignItems="center" spacing={1}>
+      <Skeleton variant="rounded" width={42} height={26} animation="wave" />
+      <Skeleton variant="text" width={60} animation="wave" />
+    </Stack>
+    {/* Action buttons skeleton */}
+    <Stack direction="row" spacing={2} justifyContent="flex-end">
+      <Skeleton variant="rounded" width={80} height={36} animation="wave" />
+      {!isViewMode && (
+        <Skeleton variant="rounded" width={100} height={36} animation="wave" />
+      )}
+    </Stack>
+  </Stack>
+);
 
 /**
  * QuizForm Component
@@ -31,6 +93,7 @@ export const QuizForm = ({
   detailData,
   onSubmit,
   isSubmitting = false,
+  isLoadingData = false,
   submitButtonText = "Save",
   onCancel,
 }: QuizFormProps) => {
@@ -207,6 +270,11 @@ export const QuizForm = ({
     formState: { errors },
   } = editForm;
 
+  // Show skeleton while loading data for edit/view mode
+  if (isLoadingData) {
+    return <QuizFormSkeleton isViewMode={isViewMode} />;
+  }
+
   return (
     <Box
       component="form"
@@ -216,39 +284,28 @@ export const QuizForm = ({
       noValidate
     >
       <Stack spacing={3}>
-        {isViewMode && (
+        {isViewMode && detailData && (
           <>
-            {isSubmitting && !detailData ? (
-              <Stack direction="row" spacing={2} alignItems="center">
-                <CircularProgress size={18} />
-                <Typography variant="body2" color="text.secondary">
-                  Loading quiz details...
-                </Typography>
-              </Stack>
-            ) : (
-              detailData && (
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                  <TextField
-                    label="Quiz ID"
-                    value={detailData.id}
-                    fullWidth
-                    InputProps={{ readOnly: true }}
-                  />
-                  <TextField
-                    label="Total Questions"
-                    value={detailData.totalQuestions}
-                    fullWidth
-                    InputProps={{ readOnly: true }}
-                  />
-                  <TextField
-                    label="Total Attempts"
-                    value={detailData.totalAttempts}
-                    fullWidth
-                    InputProps={{ readOnly: true }}
-                  />
-                </Stack>
-              )
-            )}
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <TextField
+                label="Quiz ID"
+                value={detailData.id}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Total Questions"
+                value={detailData.totalQuestions}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Total Attempts"
+                value={detailData.totalAttempts}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
+            </Stack>
             <Divider />
           </>
         )}

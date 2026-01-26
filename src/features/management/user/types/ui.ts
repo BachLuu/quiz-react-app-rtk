@@ -1,4 +1,5 @@
-import type { Role, User } from "@/shared/types";
+import type { Page, Role, User } from "@/shared/types";
+import type { UserSummary } from ".";
 
 export type { User as UserSummary };
 
@@ -26,21 +27,35 @@ export type UserFormProps = {
   detailData?: UserDetail;
   onSubmit?: (data: any) => Promise<void>;
   isSubmitting?: boolean;
+  /** Whether data is being loaded (shows skeleton) */
+  isLoadingData?: boolean;
   submitButtonText?: string;
   onCancel?: () => void;
 };
 
 export type UserListProps = {
-  users?: UserDetail[];
+  users?: Page<UserSummary>;
   isLoading?: boolean;
   page: number;
   rowsPerPage: number;
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rowsPerPage: number) => void;
-  onEdit?: (user: UserDetail) => void;
-  onDelete?: (user: UserDetail) => void;
-  onView?: (user: UserDetail) => void;
+  onEdit?: (user: UserSummary) => void;
+  onDelete?: (user: UserSummary) => void;
+  onView?: (user: UserSummary) => void;
 };
+
+export type DeleteUserDialogProps = {
+   open: boolean;
+  /** The user to delete */
+  user: UserSummary | null;
+  /** Whether delete is in progress */
+  isDeleting?: boolean;
+  /** Callback when dialog is closed */
+  onClose: () => void;
+  /** Callback when delete is confirmed */
+  onConfirm: () => void; 
+}
 
 export type UserTableColumnId =
   | "index"

@@ -12,10 +12,10 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Skeleton,
   Stack,
   Switch,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { useGetActiveRolesQuery } from "@/shared/api";
@@ -28,6 +28,82 @@ import {
 } from "../schemas/user.schema";
 import type { UserFormProps } from "../types";
 
+/** Skeleton component for UserForm loading state */
+const UserFormSkeleton = ({ isViewMode = false }: { isViewMode?: boolean }) => (
+  <Stack spacing={3}>
+    {/* View mode extra fields skeleton */}
+    {isViewMode && (
+      <>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          {[1, 2].map((i) => (
+            <Box key={i} flex={1}>
+              <Skeleton
+                variant="text"
+                width={80}
+                height={20}
+                sx={{ mb: 0.5 }}
+              />
+              <Skeleton
+                variant="rounded"
+                width="100%"
+                height={56}
+                animation="wave"
+              />
+            </Box>
+          ))}
+        </Stack>
+        <Divider />
+      </>
+    )}
+    {/* Name Fields Row skeleton */}
+    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+      {[1, 2].map((i) => (
+        <Box key={i} flex={1}>
+          <Skeleton variant="text" width={80} height={20} sx={{ mb: 0.5 }} />
+          <Skeleton
+            variant="rounded"
+            width="100%"
+            height={56}
+            animation="wave"
+          />
+        </Box>
+      ))}
+    </Stack>
+    {/* Email Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={50} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Avatar URL Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={80} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Date of Birth Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={100} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Roles Select skeleton */}
+    <Box>
+      <Skeleton variant="text" width={50} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Switch skeleton */}
+    <Stack direction="row" alignItems="center" spacing={1}>
+      <Skeleton variant="rounded" width={42} height={26} animation="wave" />
+      <Skeleton variant="text" width={60} animation="wave" />
+    </Stack>
+    {/* Action buttons skeleton */}
+    <Stack direction="row" spacing={2} justifyContent="flex-end">
+      <Skeleton variant="rounded" width={80} height={36} animation="wave" />
+      {!isViewMode && (
+        <Skeleton variant="rounded" width={100} height={36} animation="wave" />
+      )}
+    </Stack>
+  </Stack>
+);
+
 /**
  * UserForm Component
  * Reusable form for creating and editing users
@@ -39,6 +115,7 @@ export const UserForm = ({
   detailData,
   onSubmit,
   isSubmitting = false,
+  isLoadingData = false,
   submitButtonText = "Save",
   onCancel,
 }: UserFormProps) => {
@@ -77,7 +154,7 @@ export const UserForm = ({
       dateOfBirth: editSource?.dateOfBirth ?? "",
       roleIds:
         editSource?.roles?.map((role: string | Role) =>
-          typeof role === "string" ? role : role.id
+          typeof role === "string" ? role : role.id,
         ) ?? [],
       isActive: editSource?.isActive ?? true,
     },
@@ -85,7 +162,7 @@ export const UserForm = ({
 
   const getRoleLabelByIdOrName = (roleIdOrName: string): string => {
     const role = activeRoles?.find(
-      (r) => r.id === roleIdOrName || r.name === roleIdOrName
+      (r) => r.id === roleIdOrName || r.name === roleIdOrName,
     );
     return role?.name ?? roleIdOrName;
   };
@@ -277,6 +354,11 @@ export const UserForm = ({
     formState: { errors },
   } = editForm;
 
+  // Show skeleton while loading data for edit/view mode
+  if (isLoadingData) {
+    return <UserFormSkeleton isViewMode={isViewMode} />;
+  }
+
   return (
     <Box
       component="form"
@@ -286,33 +368,22 @@ export const UserForm = ({
       noValidate
     >
       <Stack spacing={3}>
-        {isViewMode && (
+        {isViewMode && detailData && (
           <>
-            {isSubmitting && !detailData ? (
-              <Stack direction="row" spacing={2} alignItems="center">
-                <CircularProgress size={18} />
-                <Typography variant="body2" color="text.secondary">
-                  Loading user details...
-                </Typography>
-              </Stack>
-            ) : (
-              detailData && (
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                  <TextField
-                    label="User ID"
-                    value={detailData.id}
-                    fullWidth
-                    InputProps={{ readOnly: true }}
-                  />
-                  <TextField
-                    label="Created At"
-                    value={new Date(detailData.createdAt).toLocaleDateString()}
-                    fullWidth
-                    InputProps={{ readOnly: true }}
-                  />
-                </Stack>
-              )
-            )}
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <TextField
+                label="User ID"
+                value={detailData.id}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
+              <TextField
+                label="Created At"
+                value={new Date(detailData.createdAt).toLocaleDateString()}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
+            </Stack>
             <Divider />
           </>
         )}

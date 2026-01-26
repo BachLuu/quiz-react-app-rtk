@@ -16,6 +16,8 @@ export interface RoleFormProps {
   detailData?: RoleDetail;
   onSubmit?: (data: any) => Promise<void>;
   isSubmitting?: boolean;
+  /** Whether data is being loaded (shows skeleton) */
+  isLoadingData?: boolean;
   submitButtonText?: string;
   onCancel?: () => void;
 }

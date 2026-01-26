@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   FormControlLabel,
+  Skeleton,
   Stack,
   Switch,
   TextField,
@@ -17,6 +18,31 @@ import {
 } from "../schemas/role.schema";
 import type { RoleFormProps } from "../types";
 
+/** Skeleton component for RoleForm loading state */
+const RoleFormSkeleton = () => (
+  <Stack spacing={3}>
+    {/* Name Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={80} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={56} animation="wave" />
+    </Box>
+    {/* Description Field skeleton */}
+    <Box>
+      <Skeleton variant="text" width={100} height={20} sx={{ mb: 0.5 }} />
+      <Skeleton variant="rounded" width="100%" height={100} animation="wave" />
+    </Box>
+    {/* Switch skeleton */}
+    <Stack direction="row" alignItems="center" spacing={1}>
+      <Skeleton variant="rounded" width={42} height={26} animation="wave" />
+      <Skeleton variant="text" width={60} animation="wave" />
+    </Stack>
+    {/* Action buttons skeleton */}
+    <Stack direction="row" spacing={2} justifyContent="flex-end">
+      <Skeleton variant="rounded" width={80} height={36} animation="wave" />
+    </Stack>
+  </Stack>
+);
+
 /**
  * RoleForm Component
  * Reusable form for creating and editing roles
@@ -28,6 +54,7 @@ export const RoleForm = ({
   detailData,
   onSubmit,
   isSubmitting = false,
+  isLoadingData = false,
   submitButtonText = "Save",
   onCancel,
 }: RoleFormProps) => {
@@ -135,6 +162,11 @@ export const RoleForm = ({
     control,
     formState: { errors },
   } = editForm;
+
+  // Show skeleton while loading data for edit/view mode
+  if (isLoadingData) {
+    return <RoleFormSkeleton />;
+  }
 
   return (
     <Box
